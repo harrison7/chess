@@ -7,6 +7,8 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessMove {
+    // implement toString() method to return chess notation representation instead of
+    // giving address
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
