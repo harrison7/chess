@@ -24,7 +24,7 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return " " + startPosition + " " + endPosition;
+        return "From " + startPosition + " to " + endPosition;
     }
 
     @Override
