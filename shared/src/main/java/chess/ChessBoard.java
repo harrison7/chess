@@ -22,6 +22,11 @@ public class ChessBoard {
         squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
+    public void addPieceHelper(int row, int col, ChessGame.TeamColor color,
+                               ChessPiece.PieceType type) {
+        addPiece(new ChessPosition(row, col), new ChessPiece(color, type));
+    }
+
     /**
      * Gets a chess piece on the chessboard
      *
@@ -39,6 +44,27 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
+        ChessPiece.PieceType[] pieces =
+                {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK};
 
+        ChessGame.TeamColor color = ChessGame.TeamColor.BLACK;
+
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                if (i > 4) {
+                    color = ChessGame.TeamColor.WHITE;
+                }
+                if (i == 1 || i == 8) {
+                    addPieceHelper(i, j, color, pieces[j]);
+                } else if (i == 2 || i == 7) {
+                    addPieceHelper(i, j, color, ChessPiece.PieceType.PAWN);
+                }
+            }
+        }
+
+        addPieceHelper(1, 1, ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
     }
 }
