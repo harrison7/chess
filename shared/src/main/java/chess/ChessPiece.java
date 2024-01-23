@@ -1,5 +1,7 @@
 package chess;
 
+import chess.pieces.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,6 +88,31 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        ChessGame.TeamColor opponent;
+        if (pieceColor == ChessGame.TeamColor.WHITE) {
+            opponent = ChessGame.TeamColor.BLACK;
+        } else {
+            opponent = ChessGame.TeamColor.WHITE;
+        }
+        if (type == PieceType.BISHOP) {
+            BishopMovesCalculator moveCalculator = new BishopMovesCalculator();
+            return moveCalculator.pieceMoves(board, myPosition, opponent);
+        } else if (type == PieceType.KING) {
+            KingMovesCalculator moveCalculator = new KingMovesCalculator();
+            return moveCalculator.pieceMoves(board, myPosition, opponent);
+        } else if (type == PieceType.KNIGHT) {
+            KnightMovesCalculator moveCalculator = new KnightMovesCalculator();
+            return moveCalculator.pieceMoves(board, myPosition, opponent);
+        } else if (type == PieceType.PAWN) {
+            PawnMovesCalculator moveCalculator = new PawnMovesCalculator();
+            return moveCalculator.pieceMoves(board, myPosition, opponent);
+        } else if (type == PieceType.QUEEN) {
+            QueenMovesCalculator moveCalculator = new QueenMovesCalculator();
+            return moveCalculator.pieceMoves(board, myPosition, opponent);
+        } else if (type == PieceType.ROOK) {
+            RookMovesCalculator moveCalculator = new RookMovesCalculator();
+            return moveCalculator.pieceMoves(board, myPosition, opponent);
+        }
+        return null;
     }
 }

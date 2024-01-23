@@ -60,7 +60,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
+        squares[8 - position.getRow()][position.getColumn() - 1] = piece;
     }
 
     public void addPieceHelper(int row, int col, ChessGame.TeamColor color,
@@ -77,7 +77,7 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
 
-        return squares[position.getRow() - 1][position.getColumn() - 1];
+        return squares[8 - position.getRow()][position.getColumn() - 1];
     }
 
     /**
@@ -91,12 +91,12 @@ public class ChessBoard {
                 ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP,
                 ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK};
 
-        ChessGame.TeamColor color = ChessGame.TeamColor.BLACK;
+        ChessGame.TeamColor color = ChessGame.TeamColor.WHITE;
 
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 if (i > 4) {
-                    color = ChessGame.TeamColor.WHITE;
+                    color = ChessGame.TeamColor.BLACK;
                 }
                 if (i == 1 || i == 8) {
                     addPieceHelper(i, j, color, pieces[j - 1]);
