@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public class BishopMovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor opponent) {
-        ArrayList<ChessMove> potentialMoves = new ArrayList<>();
+        ArrayList<ChessMove> potentialMoves = new ArrayList<ChessMove>();
         // for each possible move on board starting from myPosition, add to PotentialMoves
         boolean[] paths = {true, true, true, true};
         int[] rowDistance = {1, 1, -1, -1};

@@ -9,9 +9,13 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    private ChessPiece[][] squares;
     public ChessBoard() {
-        
+        squares = new ChessPiece[8][8];
+    }
+
+    public ChessBoard(ChessBoard copy) {
+        squares = Arrays.copyOf(copy.squares, copy.squares.length);
     }
 
     @Override
@@ -66,6 +70,10 @@ public class ChessBoard {
     public void addPieceHelper(int row, int col, ChessGame.TeamColor color,
                                ChessPiece.PieceType type) {
         addPiece(new ChessPosition(row, col), new ChessPiece(color, type));
+    }
+
+    public void removePiece(ChessPosition position) {
+        squares[8 - position.getRow()][position.getColumn() - 1] = null;
     }
 
     /**
