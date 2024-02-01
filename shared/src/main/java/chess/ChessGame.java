@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -53,21 +52,20 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        ArrayList<ChessMove> potentialMoves =
-                (ArrayList<ChessMove>) piece.pieceMoves(board, startPosition);
+        var potentialMoves = (ArrayList<ChessMove>) piece.pieceMoves(board, startPosition);
+        var removeMoves = new ArrayList<ChessMove>();
+
         TeamColor color = piece.getTeamColor();
-        TeamColor opponentColor = TeamColor.BLACK;
-        if (color == TeamColor.BLACK) {
-            opponentColor = TeamColor.WHITE;
-        }
-        Iterator<ChessMove> iterator = potentialMoves.iterator();
-        while (iterator.hasNext()) {
-            ChessMove move = iterator.next();
+        TeamColor opponentColor = (color == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
+
+        for (ChessMove move : potentialMoves) {
             //check if any move would put king in check, if so then eliminate move:
             //check all valid moves of opposing team on board after move
             //start by checking color of piece at startPosition, get opposite color
             //scan the whole board, run pieceMoves on each opponent piece
             //if any move ends on king position, eliminate original move
+            boolean shouldRemove = false;
+
             ChessBoard boardCopy = new ChessBoard(board);
             boardCopy.addPiece(move.getEndPosition(), piece);
             boardCopy.removePiece(move.getStartPosition());
@@ -99,13 +97,19 @@ public class ChessGame {
 
                         for (ChessMove checkMove : checkMoves) {
                             if (checkMove.getEndPosition().equals(kingPos)) {
-                                iterator.remove();
+                                shouldRemove = true;
+                                break;
                             }
                         }
                     }
                 }
             }
+            if (shouldRemove) {
+                removeMoves.add(move);
+            }
         }
+
+        potentialMoves.removeAll(removeMoves);
         return potentialMoves;
     }
 
@@ -119,6 +123,15 @@ public class ChessGame {
         //Throws exception if move is invalid, if leaves king in danger,
         //or if it's not your turn
 
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (getTeamTurn() != piece.getTeamColor()) {
+            throw new InvalidMoveException("Invalid move: not your turn");
+        } else if (!validMoves(move.getStartPosition()).contains(move)) {
+            throw new InvalidMoveException("Invalid move: illegal move");
+        } else {
+            board.addPiece(move.getEndPosition(), piece);
+            board.removePiece(move.getStartPosition());
+        }
     }
 
     /**
