@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -59,8 +60,9 @@ public class ChessGame {
         if (color == TeamColor.BLACK) {
             opponentColor = TeamColor.WHITE;
         }
-
-        for (ChessMove move : potentialMoves) {
+        Iterator<ChessMove> iterator = potentialMoves.iterator();
+        while (iterator.hasNext()) {
+            ChessMove move = iterator.next();
             //check if any move would put king in check, if so then eliminate move:
             //check all valid moves of opposing team on board after move
             //start by checking color of piece at startPosition, get opposite color
@@ -97,7 +99,7 @@ public class ChessGame {
 
                         for (ChessMove checkMove : checkMoves) {
                             if (checkMove.getEndPosition().equals(kingPos)) {
-                                potentialMoves.remove(move);
+                                iterator.remove();
                             }
                         }
                     }
