@@ -15,7 +15,10 @@ public class ChessBoard {
     }
 
     public ChessBoard(ChessBoard copy) {
-        squares = Arrays.copyOf(copy.squares, copy.squares.length);
+        squares = new ChessPiece[copy.squares.length][];
+        for (int i = 0; i < copy.squares.length; i++) {
+            squares[i] = Arrays.copyOf(copy.squares[i], copy.squares[i].length);
+        }
     }
 
     @Override

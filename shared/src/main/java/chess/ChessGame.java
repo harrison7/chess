@@ -109,7 +109,9 @@ public class ChessGame {
                     }
                 }
             }
+
             if (shouldRemove) {
+                //System.out.println(move);
                 removeMoves.add(move);
             }
         }
