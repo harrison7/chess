@@ -58,6 +58,21 @@ public class ChessGame {
         TeamColor color = piece.getTeamColor();
         TeamColor opponentColor = (color == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
 
+        ChessPosition kingPos = new ChessPosition(1, 1);
+        if (piece.getPieceType() != ChessPiece.PieceType.KING) {
+            for (int i = 1; i <= 8; i++) {
+                for (int j = 1; j <= 8; j++) {
+                    ChessPosition checkKingPos = new ChessPosition(i, j);
+                    ChessPiece kingPiece = board.getPiece(checkKingPos);
+                    if (kingPiece != null &&
+                            kingPiece.getTeamColor() == color &&
+                            kingPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                        kingPos = checkKingPos;
+                    }
+                }
+            }
+        }
+
         for (ChessMove move : potentialMoves) {
             //check if any move would put king in check, if so then eliminate move:
             //check all valid moves of opposing team on board after move
@@ -72,19 +87,9 @@ public class ChessGame {
             //System.out.println(boardCopy.getPiece(move.getEndPosition()));
             //System.out.println(boardCopy.getPiece(move.getStartPosition()));
 
-            ChessPosition kingPos = new ChessPosition(1, 1);
-            for (int i = 1; i <= 8; i++) {
-                for (int j = 1; j <= 8; j++) {
-                    ChessPosition checkKingPos = new ChessPosition(i, j);
-                    ChessPiece kingPiece = boardCopy.getPiece(checkKingPos);
-                    if (kingPiece != null &&
-                            kingPiece.getTeamColor() == color &&
-                            kingPiece.getPieceType() == ChessPiece.PieceType.KING) {
-                        kingPos = checkKingPos;
-                    }
-                }
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                kingPos = move.getEndPosition();
             }
-            //System.out.println(kingPos);
 
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
