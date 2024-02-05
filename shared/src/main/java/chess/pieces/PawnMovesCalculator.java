@@ -23,7 +23,7 @@ public class PawnMovesCalculator {
                     potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
                 }
             }
-            if (board.getPiece(captureLeft) != null &&
+            if (captureLeft.getColumn() > 0 && board.getPiece(captureLeft) != null &&
                     board.getPiece(captureLeft).getTeamColor() == opponent) {
                 if (moveRow > 7) {
                     potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.QUEEN));
@@ -34,7 +34,7 @@ public class PawnMovesCalculator {
                     potentialMoves.add(new ChessMove(myPosition, captureLeft, null));
                 }
             }
-            if (board.getPiece(captureRight) != null &&
+            if (captureRight.getColumn() < 8 && board.getPiece(captureRight) != null &&
                     board.getPiece(captureRight).getTeamColor() == opponent) {
                 if (moveRow > 7) {
                     potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.QUEEN));
@@ -55,8 +55,8 @@ public class PawnMovesCalculator {
         } else {
             int moveRow = myPosition.getRow() - 1;
             ChessPosition moveIdea = new ChessPosition(moveRow, myPosition.getColumn());
-            ChessPosition captureLeft = new ChessPosition(moveRow, myPosition.getColumn() + 1);
-            ChessPosition captureRight = new ChessPosition(moveRow, myPosition.getColumn() - 1);
+            ChessPosition captureLeft = new ChessPosition(moveRow, myPosition.getColumn() - 1);
+            ChessPosition captureRight = new ChessPosition(moveRow, myPosition.getColumn() + 1);
             if (board.getPiece(moveIdea) == null) {
                 if (moveRow < 2) {
                     potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.QUEEN));
@@ -67,7 +67,7 @@ public class PawnMovesCalculator {
                     potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
                 }
             }
-            if (board.getPiece(captureLeft) != null &&
+            if (captureLeft.getColumn() > 0 && board.getPiece(captureLeft) != null &&
                     board.getPiece(captureLeft).getTeamColor() == opponent) {
                 if (moveRow < 2) {
                     potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.QUEEN));
@@ -78,7 +78,7 @@ public class PawnMovesCalculator {
                     potentialMoves.add(new ChessMove(myPosition, captureLeft, null));
                 }
             }
-            if (board.getPiece(captureRight) != null &&
+            if (captureRight.getColumn() < 8 && board.getPiece(captureRight) != null &&
                     board.getPiece(captureRight).getTeamColor() == opponent) {
                 if (moveRow < 2) {
                     potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.QUEEN));
