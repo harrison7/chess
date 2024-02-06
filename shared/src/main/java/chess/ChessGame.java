@@ -60,37 +60,22 @@ public class ChessGame {
 
         ChessPosition kingPos = new ChessPosition(1, 1);
         if (piece.getPieceType() != ChessPiece.PieceType.KING) {
-            for (int i = 1; i <= 8; i++) {
-                for (int j = 1; j <= 8; j++) {
-                    ChessPosition checkKingPos = new ChessPosition(i, j);
-                    ChessPiece kingPiece = getBoard().getPiece(checkKingPos);
-                    if (kingPiece != null &&
-                            kingPiece.getTeamColor() == color &&
-                            kingPiece.getPieceType() == ChessPiece.PieceType.KING) {
-                        kingPos = checkKingPos;
-                    }
-                }
-            }
+            kingPos = getBoard().getKingPosition(color);
         }
 
+        // Check each move to see if it would put king in check
         for (ChessMove move : potentialMoves) {
-            //check if any move would put king in check, if so then eliminate move:
-            //check all valid moves of opposing team on board after move
-            //start by checking color of piece at startPosition, get opposite color
-            //scan the whole board, run pieceMoves on each opponent piece
-            //if any move ends on king position, eliminate original move
             boolean shouldRemove = false;
 
             ChessBoard boardCopy = new ChessBoard(getBoard());
             boardCopy.addPiece(move.getEndPosition(), piece);
             boardCopy.removePiece(move.getStartPosition());
-            //System.out.println(boardCopy.getPiece(move.getEndPosition()));
-            //System.out.println(boardCopy.getPiece(move.getStartPosition()));
 
             if (piece.getPieceType() == ChessPiece.PieceType.KING) {
                 kingPos = move.getEndPosition();
             }
 
+            // Check every piece in this simulation to see if any can capture king
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
                     ChessPosition checkPos = new ChessPosition(i, j);
@@ -152,7 +137,28 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        boolean check = false;
 
+        ChessPosition kingPos = getBoard().getKingPosition(teamColor);
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition checkPos = new ChessPosition(i, j);
+                ChessPiece checkPiece = getBoard().getPiece(checkPos);
+                if (checkPiece != null &&
+                        checkPiece.getTeamColor() != teamColor) {
+                    var checkMoves =
+                            (ArrayList<ChessMove>) checkPiece.pieceMoves(getBoard(), checkPos);
+
+                    for (ChessMove checkMove : checkMoves) {
+                        if (checkMove.getEndPosition().equals(kingPos)) {
+                            check = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return check;
     }
 
     /**
@@ -162,7 +168,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheck(teamColor) && isInStalemate(teamColor);
     }
 
     /**
@@ -173,7 +179,22 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        boolean stalemate = false;
+
+        ChessPosition kingPos = getBoard().getKingPosition(teamColor);
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition checkPos = new ChessPosition(i, j);
+                ChessPiece checkPiece = getBoard().getPiece(checkPos);
+                if (checkPiece != null &&
+                        checkPiece.getTeamColor() == teamColor &&
+                        validMoves(checkPos) != null &&
+                        !validMoves(checkPos).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**

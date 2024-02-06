@@ -117,4 +117,19 @@ public class ChessBoard {
             }
         }
     }
+
+    public ChessPosition getKingPosition(ChessGame.TeamColor color) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition checkKingPos = new ChessPosition(i, j);
+                ChessPiece kingPiece = getPiece(checkKingPos);
+                if (kingPiece != null &&
+                        kingPiece.getTeamColor() == color &&
+                        kingPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return checkKingPos;
+                }
+            }
+        }
+        return null;
+    }
 }
