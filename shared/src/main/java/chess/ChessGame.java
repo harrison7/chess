@@ -51,8 +51,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece piece = board.getPiece(startPosition);
-        var potentialMoves = (ArrayList<ChessMove>) piece.pieceMoves(board, startPosition);
+        ChessPiece piece = getBoard().getPiece(startPosition);
+        var potentialMoves = (ArrayList<ChessMove>) piece.pieceMoves(getBoard(), startPosition);
         var removeMoves = new ArrayList<ChessMove>();
 
         TeamColor color = piece.getTeamColor();
@@ -63,7 +63,7 @@ public class ChessGame {
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
                     ChessPosition checkKingPos = new ChessPosition(i, j);
-                    ChessPiece kingPiece = board.getPiece(checkKingPos);
+                    ChessPiece kingPiece = getBoard().getPiece(checkKingPos);
                     if (kingPiece != null &&
                             kingPiece.getTeamColor() == color &&
                             kingPiece.getPieceType() == ChessPiece.PieceType.KING) {
@@ -81,7 +81,7 @@ public class ChessGame {
             //if any move ends on king position, eliminate original move
             boolean shouldRemove = false;
 
-            ChessBoard boardCopy = new ChessBoard(board);
+            ChessBoard boardCopy = new ChessBoard(getBoard());
             boardCopy.addPiece(move.getEndPosition(), piece);
             boardCopy.removePiece(move.getStartPosition());
             //System.out.println(boardCopy.getPiece(move.getEndPosition()));
@@ -132,7 +132,7 @@ public class ChessGame {
 
         System.out.println(move.getStartPosition());
         System.out.println(validMoves(move.getStartPosition()));
-        ChessPiece piece = board.getPiece(move.getStartPosition());
+        ChessPiece piece = getBoard().getPiece(move.getStartPosition());
         if (getTeamTurn() != piece.getTeamColor()) {
             throw new InvalidMoveException("Invalid move: not your turn");
         } else if (!validMoves(move.getStartPosition()).contains(move)) {
@@ -152,7 +152,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
     }
 
     /**
