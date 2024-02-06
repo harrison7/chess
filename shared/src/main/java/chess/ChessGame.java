@@ -115,8 +115,6 @@ public class ChessGame {
         //Throws exception if move is invalid, if leaves king in danger,
         //or if it's not your turn
 
-        System.out.println(move.getStartPosition());
-        System.out.println(validMoves(move.getStartPosition()));
         ChessPiece piece = getBoard().getPiece(move.getStartPosition());
         if (getTeamTurn() != piece.getTeamColor()) {
             throw new InvalidMoveException("Invalid move: not your turn");
@@ -126,6 +124,9 @@ public class ChessGame {
             //System.out.println(board);
             board.addPiece(move.getEndPosition(), piece);
             board.removePiece(move.getStartPosition());
+            if (move.getPromotionPiece() != null) {
+                piece.setPieceType(move.getPromotionPiece());
+            }
             setTeamTurn((team == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE);
         }
     }
