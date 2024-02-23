@@ -3,17 +3,20 @@ package dataAccess;
 import model.AuthData;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
     private HashMap<String, AuthData> authList;
     public void clear() {
         authList = new HashMap<>();
     };
-    public void createAuth(AuthData auth) throws DataAccessException {
+    public AuthData createAuth(AuthData auth) throws DataAccessException {
         if (authList.containsKey(auth.username())) {
             throw new DataAccessException("User is already authenticated");
         } else {
             authList.put(auth.username(), auth);
+            String authToken = UUID.randomUUID().toString();
+            return new AuthData(authToken, auth.username());
         }
     };
     public AuthData getAuth(AuthData auth) throws DataAccessException {

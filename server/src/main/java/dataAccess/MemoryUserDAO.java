@@ -22,11 +22,7 @@ public class MemoryUserDAO implements UserDAO {
             userList.put(user.username(), user);
         }
     }
-    public UserData getUser(UserData user) throws DataAccessException {
-        if (userList.containsKey(user.username())) {
-            return userList.get(user.username());
-        } else {
-            throw new DataAccessException("User does not exist");
-        }
+    public UserData getUser(UserData user) {
+        return userList.getOrDefault(user.username(), null);
     }
 }
