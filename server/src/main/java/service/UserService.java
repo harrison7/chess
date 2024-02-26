@@ -22,7 +22,7 @@ public class UserService {
         }
     }
     public AuthData login(UserData user) {
-
+        return new AuthData("", "");
     }
     public void logout(UserData user) {
 
