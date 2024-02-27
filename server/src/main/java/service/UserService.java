@@ -9,8 +9,9 @@ public class UserService {
     UserDAO userDAO;
     AuthDAO authDAO;
 
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
+        this.authDAO = authDAO;
     }
     public AuthData register(UserData user) throws DataAccessException {
         if (userDAO.getUser(user) == null) {
@@ -21,10 +22,16 @@ public class UserService {
             throw new DataAccessException("User already exists");
         }
     }
-    public AuthData login(UserData user) {
-        return new AuthData("", "");
+    public AuthData login(UserData user) throws DataAccessException {
+        if (userDAO.getUser(user) != null) {
+            userDAO.getUser(user);
+            AuthData newAuth = new AuthData("", user.username());
+            return authDAO.createAuth(newAuth);
+        } else {
+            throw new DataAccessException("User does not exist");
+        }
     }
-    public void logout(UserData user) {
-
+    public void logout(AuthData auth) throws DataAccessException {
+        authDAO.deleteAuth(auth);
     }
 }

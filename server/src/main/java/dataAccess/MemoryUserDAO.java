@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MemoryUserDAO implements UserDAO {
     private HashMap<String, UserData> userList;
@@ -22,7 +23,13 @@ public class MemoryUserDAO implements UserDAO {
             userList.put(user.username(), user);
         }
     }
-    public UserData getUser(UserData user) {
-        return userList.getOrDefault(user.username(), null);
+    public UserData getUser(UserData user) throws DataAccessException {
+        UserData returnUser = userList.getOrDefault(user.username(), null);
+        if (returnUser != null &&
+                !Objects.equals(returnUser.password(), user.password())) {
+            throw new DataAccessException("Wrong password");
+        } else {
+            return returnUser;
+        }
     }
 }
