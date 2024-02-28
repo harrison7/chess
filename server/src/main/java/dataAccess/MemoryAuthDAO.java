@@ -1,15 +1,25 @@
 package dataAccess;
 
 import model.AuthData;
+import server.handlers.ServerHandler;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
+    private static MemoryAuthDAO instance;
     private HashMap<String, AuthData> authList;
+
 
     public MemoryAuthDAO() {
         authList = new HashMap<>();
+    }
+
+    public static synchronized MemoryAuthDAO getInstance() {
+        if (instance == null) {
+            instance = new MemoryAuthDAO();
+        }
+        return instance;
     }
 
     public void clear() {

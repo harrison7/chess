@@ -7,10 +7,18 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class MemoryUserDAO implements UserDAO {
+    private static MemoryUserDAO instance;
     private HashMap<String, UserData> userList;
 
     public MemoryUserDAO() {
         userList = new HashMap<>();
+    }
+
+    public static synchronized MemoryUserDAO getInstance() {
+        if (instance == null) {
+            instance = new MemoryUserDAO();
+        }
+        return instance;
     }
 
     public void clear() {

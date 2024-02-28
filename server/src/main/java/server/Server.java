@@ -1,7 +1,7 @@
 package server;
 
 import dataAccess.*;
-import server.handlers.ClearHandler;
+import server.handlers.ServerHandler;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -39,9 +39,9 @@ public class Server {
         Spark.delete("/pet", this::deleteAllPets);
         Spark.exception(ResponseException.class, this::exceptionHandler);*/
         Spark.delete("/db", (req, res) -> {
-            ClearHandler handler = ClearHandler.getInstance();
-            handler.handleRequest(req, res);
-        }
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.clear(req, res);
+        });
 
 
         Spark.init();

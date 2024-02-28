@@ -2,6 +2,8 @@ package service;
 
 import dataAccess.*;
 import model.*;
+import server.requests.RegisterRequest;
+import server.results.RegisterResult;
 
 import java.util.HashMap;
 
@@ -13,11 +15,14 @@ public class UserService {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
-    public AuthData register(UserData user) throws DataAccessException {
+    public RegisterResult register(RegisterRequest req) throws DataAccessException {
+        UserData user = new UserData(req.username(), req.password(), req.email());
         if (userDAO.getUser(user) == null) {
             userDAO.createUser(user);
             AuthData newAuth = new AuthData("", user.username());
-            return authDAO.createAuth(newAuth);
+            AuthData returnAuth = authDAO.createAuth(newAuth);
+            return new RegisterResult(true, null, returnAuth.username(),
+                    returnAuth.authToken());
         } else {
             throw new DataAccessException("User already exists");
         }

@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataAccess.*;
 import model.*;
 import org.junit.jupiter.api.*;
+import server.requests.RegisterRequest;
 import service.*;
 
 public class ServiceTests {
@@ -23,6 +24,7 @@ public class ServiceTests {
 
     @Test
     void registerSuccess() throws DataAccessException {
+        RegisterRequest =
         UserData userData = new UserData("u", "p", "e");
         AuthData newToken = userService.register(userData);
         AuthData storedToken = authDAO.getAuth(newToken);

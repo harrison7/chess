@@ -9,10 +9,18 @@ import java.util.Map;
 import java.util.Objects;
 
 public class MemoryGameDAO implements GameDAO {
+    private static MemoryGameDAO instance;
     private HashMap<Integer, GameData> gameList;
 
     public MemoryGameDAO() {
         gameList = new HashMap<>();
+    }
+
+    public static synchronized MemoryGameDAO getInstance() {
+        if (instance == null) {
+            instance = new MemoryGameDAO();
+        }
+        return instance;
     }
 
     public void clear() {
