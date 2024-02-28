@@ -9,7 +9,7 @@ public class Main {
         port = server.run(port);
         System.out.printf("Server started on port %d%n", port);
 
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Server: " + piece);
+//        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+//        System.out.println("♕ 240 Chess Server: " + piece);
     }
 }

@@ -1,5 +1,6 @@
 package serviceTests;
 
+import chess.ChessGame;
 import dataAccess.*;
 import model.*;
 import org.junit.jupiter.api.*;
@@ -11,6 +12,8 @@ public class ServiceTests {
     private GameDAO gameDAO = new MemoryGameDAO();
     private ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
     private UserService userService = new UserService(userDAO, authDAO);
+
+    private GameService gameService = new GameService(gameDAO, authDAO);
 
     @BeforeEach
     @Test
@@ -94,4 +97,77 @@ public class ServiceTests {
         });
     }
 
+    @Test
+    void listGamesSuccess() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        AuthData authData = userService.register(userData);
+        GameData newGame = new GameData(0, "", "",
+                "name", new ChessGame());
+        gameService.createGame(authData, newGame);
+
+        Assertions.assertFalse(gameService.listGames(authData).isEmpty());
+    }
+
+    @Test
+    void listGamesFail() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        AuthData authData = userService.register(userData);
+        AuthData wrongData = new AuthData("", "u");
+        GameData newGame = new GameData(0, "", "",
+                "name", new ChessGame());
+        gameService.createGame(authData, newGame);
+
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            gameService.listGames(wrongData);
+        });
+    }
+    @Test
+    void createGameSuccess() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        AuthData authData = userService.register(userData);
+        GameData newGame = new GameData(0, "", "",
+                "name", new ChessGame());
+        GameData gameData = gameService.createGame(authData, newGame);
+
+        Assertions.assertTrue(gameData.gameID() > 0);
+    }
+
+    @Test
+    void createGameFail() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        AuthData authData = userService.register(userData);
+        AuthData wrongData = new AuthData("", "u");
+        GameData newGame = new GameData(0, "", "",
+                "name", new ChessGame());
+
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            gameService.createGame(wrongData, newGame);
+        });
+    }
+
+    @Test
+    void joinGameSuccess() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        AuthData authData = userService.register(userData);
+        GameData newGame = new GameData(0, "", "",
+                "name", new ChessGame());
+        GameData gameData = gameService.createGame(authData, newGame);
+        GameData joinedGame = gameService.joinGame(authData, gameData, ChessGame.TeamColor.WHITE);
+
+        Assertions.assertTrue(joinedGame.gameID() > 0);
+    }
+
+    @Test
+    void joinGameFail() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        AuthData authData = userService.register(userData);
+        GameData newGame = new GameData(0, "", "",
+                "name", new ChessGame());
+        GameData gameData = gameService.createGame(authData, newGame);
+        AuthData wrongData = new AuthData("", "u");
+
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            gameService.joinGame(wrongData, gameData, ChessGame.TeamColor.WHITE);
+        });
+    }
 }
