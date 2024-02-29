@@ -20,24 +20,25 @@ public class GameService {
         if (authDAO.getAuth(auth).authToken().equals(auth.authToken())) {
             return gameDAO.listGames();
         } else {
-            throw new DataAccessException("Authentication is incorrect");
+            throw new DataAccessException("unauthorized");
         }
     }
 
     public GameData createGame(AuthData auth, GameData game) throws DataAccessException {
-        if (authDAO.getAuth(auth).equals(auth)) {
+        if (authDAO.getAuth(auth).authToken().equals(auth.authToken())) {
             return gameDAO.createGame(game);
         } else {
-            throw new DataAccessException("Authentication is incorrect");
+            throw new DataAccessException("unauthorized");
         }
     }
 
     public GameData joinGame(AuthData auth, GameData game, ChessGame.TeamColor clientColor)
             throws DataAccessException {
-        if (authDAO.getAuth(auth).equals(auth) && gameDAO.getGame(game).equals(game)) {
+        if (authDAO.getAuth(auth).authToken().equals(auth.authToken()) &&
+                gameDAO.getGame(game).gameID() == game.gameID()) {
             return gameDAO.updateGame(game, auth, clientColor);
         } else {
-            throw new DataAccessException("Authentication is incorrect");
+            throw new DataAccessException("unauthorized");
         }
     }
 }

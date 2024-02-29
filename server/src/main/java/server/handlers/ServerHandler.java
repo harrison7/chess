@@ -3,6 +3,7 @@ package server.handlers;
 import com.google.gson.Gson;
 import dataAccess.*;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import server.requests.*;
 import server.results.*;
@@ -11,7 +12,6 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class ServerHandler {
@@ -109,21 +109,43 @@ public class ServerHandler {
     public String listGames(Request req, Response res) {
         var gson = new Gson();
 
-        var request = new listGamesRequest(req.headers("Authorization"));
+        var request = new ListGamesRequest(req.headers("Authorization"));
         var auth = new AuthData(request.authorization(), "");
 
         GameService service = new GameService(gameDAO, authDAO);
 
         try {
             var list = service.listGames(auth);
-            var result = new listGamesResult(null, list.values());
+            var result = new ListGamesResult(null, list.values());
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
             if (Objects.equals(e.getMessage(), "unauthorized")) {
                 res.status(401);
             }
-            return gson.toJson(new LogoutResult("Error: " + e.getMessage()));
+            return gson.toJson(new ListGamesResult("Error: " + e.getMessage(), null));
+        }
+    }
+
+    public String createGame(Request req, Response res) {
+        var gson = new Gson();
+        var tempRequest = gson.fromJson(req.body(), CreateGameRequest.class);
+        var request = new CreateGameRequest(req.headers("Authorization"), tempRequest.gameName());
+        var auth = new AuthData(request.authorization(), "");
+        var game = new GameData(0, "", "", request.gameName(), null);
+
+        GameService service = new GameService(gameDAO, authDAO);
+
+        try {
+            var newGame = service.createGame(auth, game);
+            var result = new CreateGameResult(null, String.valueOf(newGame.gameID()));
+            res.status(200);
+            return gson.toJson(result);
+        } catch (DataAccessException e) {
+            if (Objects.equals(e.getMessage(), "unauthorized")) {
+                res.status(401);
+            }
+            return gson.toJson(new CreateGameResult("Error: " + e.getMessage(), null));
         }
     }
 }

@@ -124,7 +124,7 @@ public class ServiceTests {
         UserData userData = new UserData("u", "p", "e");
         AuthData authData = userService.register(userData);
         GameData newGame = new GameData(0, "", "",
-                "name", new ChessGame());
+                "name", null);
         GameData gameData = gameService.createGame(authData, newGame);
 
         Assertions.assertTrue(gameData.gameID() > 0);
