@@ -14,36 +14,15 @@ public class PawnMovesCalculator {
             ChessPosition captureLeft = new ChessPosition(moveRow, myPosition.getColumn() - 1);
             ChessPosition captureRight = new ChessPosition(moveRow, myPosition.getColumn() + 1);
             if (board.getPiece(moveIdea) == null) {
-                if (moveRow > 7) {
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.QUEEN));
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.ROOK));
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.BISHOP));
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.KNIGHT));
-                } else {
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
-                }
+                addMoves(moveRow, myPosition, moveIdea, potentialMoves, true);
             }
             if (captureLeft.getColumn() > 0 && board.getPiece(captureLeft) != null &&
                     board.getPiece(captureLeft).getTeamColor() == opponent) {
-                if (moveRow > 7) {
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.QUEEN));
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.ROOK));
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.BISHOP));
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.KNIGHT));
-                } else {
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, null));
-                }
+                addMoves(moveRow, myPosition, captureLeft, potentialMoves, true);
             }
             if (captureRight.getColumn() < 8 && board.getPiece(captureRight) != null &&
                     board.getPiece(captureRight).getTeamColor() == opponent) {
-                if (moveRow > 7) {
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.QUEEN));
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.ROOK));
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.BISHOP));
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.KNIGHT));
-                } else {
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, null));
-                }
+                addMoves(moveRow, myPosition, captureRight, potentialMoves, true);
             }
             if (myPosition.getRow() < 3) {
                 int moveBig = myPosition.getRow() + 2;
@@ -58,36 +37,15 @@ public class PawnMovesCalculator {
             ChessPosition captureLeft = new ChessPosition(moveRow, myPosition.getColumn() - 1);
             ChessPosition captureRight = new ChessPosition(moveRow, myPosition.getColumn() + 1);
             if (board.getPiece(moveIdea) == null) {
-                if (moveRow < 2) {
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.QUEEN));
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.ROOK));
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.BISHOP));
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, ChessPiece.PieceType.KNIGHT));
-                } else {
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
-                }
+                addMoves(moveRow, myPosition, moveIdea, potentialMoves, false);
             }
             if (captureLeft.getColumn() > 0 && board.getPiece(captureLeft) != null &&
                     board.getPiece(captureLeft).getTeamColor() == opponent) {
-                if (moveRow < 2) {
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.QUEEN));
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.ROOK));
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.BISHOP));
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, ChessPiece.PieceType.KNIGHT));
-                } else {
-                    potentialMoves.add(new ChessMove(myPosition, captureLeft, null));
-                }
+                addMoves(moveRow, myPosition, captureLeft, potentialMoves, false);
             }
             if (captureRight.getColumn() < 8 && board.getPiece(captureRight) != null &&
                     board.getPiece(captureRight).getTeamColor() == opponent) {
-                if (moveRow < 2) {
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.QUEEN));
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.ROOK));
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.BISHOP));
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, ChessPiece.PieceType.KNIGHT));
-                } else {
-                    potentialMoves.add(new ChessMove(myPosition, captureRight, null));
-                }
+                addMoves(moveRow, myPosition, captureRight, potentialMoves, false);
             }
             if (myPosition.getRow() > 6) {
                 int moveBig = myPosition.getRow() - 2;
@@ -98,5 +56,17 @@ public class PawnMovesCalculator {
             }
         }
         return potentialMoves;
+    }
+
+    private void addMoves(int moveRow, ChessPosition myPosition, ChessPosition moveIdea, Collection<ChessMove> potentialMoves, boolean up) {
+        boolean truth = up ? (moveRow > 7) : (moveRow < 2);
+        ChessPiece.PieceType[] piece = {ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT};
+        if (truth) {
+            for (int i = 0; i < 4; i++) {
+                potentialMoves.add(new ChessMove(myPosition, moveIdea, piece[i]));
+            }
+        } else {
+            potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
+        }
     }
 }

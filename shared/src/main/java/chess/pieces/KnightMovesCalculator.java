@@ -26,7 +26,6 @@ public class KnightMovesCalculator {
             int moveCol = myPosition.getColumn() + colDistance[i];
             ChessPosition moveIdea = new ChessPosition(moveRow, moveCol);
             //checkPaths(paths, moveIdea);
-            //System.out.println(Arrays.toString(paths));
             if (paths[i]) {
                 if (board.getPiece(moveIdea) != null &&
                         board.getPiece(moveIdea).getTeamColor() == opponent) {
