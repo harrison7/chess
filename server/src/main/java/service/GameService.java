@@ -17,7 +17,7 @@ public class GameService {
     }
 
     public Map<Integer, GameData> listGames(AuthData auth) throws DataAccessException {
-        if (authDAO.getAuth(auth).equals(auth)) {
+        if (authDAO.getAuth(auth).authToken().equals(auth.authToken())) {
             return gameDAO.listGames();
         } else {
             throw new DataAccessException("Authentication is incorrect");
