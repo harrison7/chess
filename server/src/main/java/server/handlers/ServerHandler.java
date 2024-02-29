@@ -132,7 +132,7 @@ public class ServerHandler {
         var tempRequest = gson.fromJson(req.body(), CreateGameRequest.class);
         var request = new CreateGameRequest(req.headers("Authorization"), tempRequest.gameName());
         var auth = new AuthData(request.authorization(), "");
-        var game = new GameData(0, "", "", request.gameName(), null);
+        var game = new GameData(0, null, null, request.gameName(), null);
 
         GameService service = new GameService(gameDAO, authDAO);
 
@@ -146,6 +146,35 @@ public class ServerHandler {
                 res.status(401);
             }
             return gson.toJson(new CreateGameResult("Error: " + e.getMessage(), null));
+        }
+    }
+
+    public String joinGame(Request req, Response res) {
+        var gson = new Gson();
+        var tempRequest = gson.fromJson(req.body(), JoinGameRequest.class);
+        var request = new JoinGameRequest(req.headers("Authorization"),
+                tempRequest.playerColor(), tempRequest.gameID());
+        var tempAuth = new AuthData(request.authorization(), "");
+
+        GameService service = new GameService(gameDAO, authDAO);
+
+        try {
+            var username = authDAO.getAuth(tempAuth).username();
+            var auth = new AuthData(request.authorization(), username);
+            var game = new GameData(request.gameID(), null, null, null, null);
+            var newGame = service.joinGame(auth, game, request.playerColor());
+            var result = new JoinGameResult(null);
+            res.status(200);
+            return gson.toJson(result);
+        } catch (DataAccessException e) {
+            if (Objects.equals(e.getMessage(), "bad request")) {
+                res.status(400);
+            } else if (Objects.equals(e.getMessage(), "unauthorized")) {
+                res.status(401);
+            } else if (Objects.equals(e.getMessage(), "already taken")) {
+                res.status(403);
+            }
+            return gson.toJson(new JoinGameResult("Error: " + e.getMessage()));
         }
     }
 }

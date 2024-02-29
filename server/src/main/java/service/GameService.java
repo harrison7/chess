@@ -32,9 +32,11 @@ public class GameService {
         }
     }
 
-    public GameData joinGame(AuthData auth, GameData game, ChessGame.TeamColor clientColor)
+    public GameData joinGame(AuthData auth, GameData game, String clientColor)
             throws DataAccessException {
-        if (authDAO.getAuth(auth).authToken().equals(auth.authToken()) &&
+        if (game.gameID() == 0) {
+            throw new DataAccessException("bad request");
+        } else if (authDAO.getAuth(auth).authToken().equals(auth.authToken()) &&
                 gameDAO.getGame(game).gameID() == game.gameID()) {
             return gameDAO.updateGame(game, auth, clientColor);
         } else {

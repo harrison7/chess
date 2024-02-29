@@ -41,29 +41,48 @@ public class MemoryGameDAO implements GameDAO {
     };
     public GameData getGame(GameData game) throws DataAccessException {
         if (gameList.containsKey(game.gameID())) {
-            return gameList.get(game.gameID());
-        } else {
+            var trueGame = gameList.get(game.gameID());
+            return gameList.get(trueGame.gameID());
+        }
+//        GameData returnGame = null;
+//        for (var gameName : gameList.values()) {
+//            if (Objects.equals(gameName.gameName(), game.gameName())) {
+//                returnGame = gameName;
+//            }
+//        }
+//        if (returnGame != null) {
+//            return returnGame;
+//        }
+        else {
             throw new DataAccessException("Game does not exist");
         }
     };
     public Map<Integer, GameData> listGames() {
         return gameList;
     };
-    public GameData updateGame(GameData game, AuthData auth, ChessGame.TeamColor clientColor)
+    public GameData updateGame(GameData game, AuthData auth, String clientColor)
             throws DataAccessException {
         GameData updatedGame;
-        if (gameList.containsKey(game.gameID())) {
-            if (clientColor == ChessGame.TeamColor.WHITE) {
-                updatedGame = new GameData(game.gameID(), auth.username(),
-                        game.blackUsername(), game.gameName(), game.game());
+        var trueGame = gameList.get(game.gameID());
+        if (gameList.containsKey(trueGame.gameID())) {
+            if (clientColor == null) {
+                return getGame(game);
+            } else if ((clientColor.equals("WHITE") && trueGame.whiteUsername() != null) ||
+                    (clientColor.equals("BLACK") && trueGame.blackUsername() != null)){
+                throw new DataAccessException("already taken");
+            } else if (clientColor.equals("WHITE")) {
+                updatedGame = new GameData(trueGame.gameID(), auth.username(),
+                        trueGame.blackUsername(), trueGame.gameName(), trueGame.game());
+            } else if (clientColor.equals("BLACK")) {
+                updatedGame = new GameData(trueGame.gameID(), trueGame.whiteUsername(),
+                        auth.username(), trueGame.gameName(), trueGame.game());
             } else {
-                updatedGame = new GameData(game.gameID(), game.whiteUsername(),
-                        auth.username(), game.gameName(), game.game());
+                throw new DataAccessException("wrong color");
             }
-            gameList.put(game.gameID(), updatedGame);
+            gameList.put(trueGame.gameID(), updatedGame);
             return updatedGame;
         } else {
-            throw new DataAccessException("Game can't be updated as it doesn't exist");
+            throw new DataAccessException("bad request");
         }
     };
 }

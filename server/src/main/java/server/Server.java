@@ -54,6 +54,10 @@ public class Server {
             ServerHandler handler = ServerHandler.getInstance();
             return handler.createGame(req, res);
         });
+        Spark.put("/game", (req, res) -> {
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.joinGame(req, res);
+        });
 
         Spark.delete("/db", (req, res) -> {
             ServerHandler handler = ServerHandler.getInstance();

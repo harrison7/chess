@@ -11,6 +11,6 @@ public interface GameDAO {
     public GameData createGame(GameData game) throws DataAccessException;
     public GameData getGame(GameData game) throws DataAccessException;
     public Map<Integer, GameData> listGames() throws DataAccessException;
-    public GameData updateGame(GameData game, AuthData auth, ChessGame.TeamColor clientColor)
+    public GameData updateGame(GameData game, AuthData auth, String clientColor)
             throws DataAccessException;
 }

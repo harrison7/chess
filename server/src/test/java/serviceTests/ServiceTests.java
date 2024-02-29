@@ -147,10 +147,10 @@ public class ServiceTests {
     void joinGameSuccess() throws DataAccessException {
         UserData userData = new UserData("u", "p", "e");
         AuthData authData = userService.register(userData);
-        GameData newGame = new GameData(0, "", "",
+        GameData newGame = new GameData(0, null, null,
                 "name", new ChessGame());
         GameData gameData = gameService.createGame(authData, newGame);
-        GameData joinedGame = gameService.joinGame(authData, gameData, ChessGame.TeamColor.WHITE);
+        GameData joinedGame = gameService.joinGame(authData, gameData, "WHITE");
 
         Assertions.assertTrue(joinedGame.gameID() > 0);
     }
@@ -165,7 +165,7 @@ public class ServiceTests {
         AuthData wrongData = new AuthData("", "u");
 
         Assertions.assertThrows(DataAccessException.class, () -> {
-            gameService.joinGame(wrongData, gameData, ChessGame.TeamColor.WHITE);
+            gameService.joinGame(wrongData, gameData, "WHITE");
         });
     }
 }
