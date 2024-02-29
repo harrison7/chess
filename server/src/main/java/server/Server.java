@@ -33,6 +33,10 @@ public class Server {
 
         //Spark.webSocket("/connect", webSocketHandler);
 
+        Spark.post("/user", (req, res) -> {
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.register(req, res);
+        });
         /*Spark.post("/pet", this::addPet);
         Spark.get("/pet", this::listPets);
         Spark.delete("/pet/:id", this::deletePet);

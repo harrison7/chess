@@ -2,6 +2,7 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataAccess.*;
+import model.UserData;
 import server.requests.ClearRequest;
 import server.requests.RegisterRequest;
 import server.results.ClearResult;
@@ -9,6 +10,8 @@ import server.results.RegisterResult;
 import service.ClearService;
 import service.UserService;
 import spark.*;
+
+import java.util.Objects;
 
 public class ServerHandler {
 
@@ -28,7 +31,7 @@ public class ServerHandler {
 
     public String clear(Request req, Response res) {
         var gson = new Gson();
-        ClearRequest request = (ClearRequest)gson.fromJson(String.valueOf(req), ClearRequest.class);
+        ClearRequest request = gson.fromJson(req.body(), ClearRequest.class);
 
         ClearService service = new ClearService(userDAO, authDAO, gameDAO);
         ClearResult result = service.clear();
@@ -39,12 +42,24 @@ public class ServerHandler {
 
     public String register(Request req, Response res) throws DataAccessException {
         var gson = new Gson();
-        RegisterRequest request = (RegisterRequest)gson.fromJson("", RegisterRequest.class);
+        RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
+        var user = new UserData(request.username(), request.password(), request.email());
 
         UserService service = new UserService(userDAO, authDAO);
-        RegisterResult result = service.register(request);
-        res.status(200);
 
-        return gson.toJson(result);
+        try {
+            var auth = service.register(user);
+            var result = new RegisterResult(null, auth.username(), auth.authToken());
+            res.status(200);
+            return gson.toJson(result);
+        } catch (DataAccessException e) {
+            if (Objects.equals(e.getMessage(), "bad request")) {
+                res.status(400);
+            } else if (Objects.equals(e.getMessage(), "already taken")) {
+                res.status(403);
+            }
+
+            return gson.toJson(new RegisterResult("Error: " + e.getMessage(), null, null));
+        }
     }
 }

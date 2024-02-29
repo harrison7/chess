@@ -15,16 +15,17 @@ public class UserService {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
-    public RegisterResult register(RegisterRequest req) throws DataAccessException {
-        UserData user = new UserData(req.username(), req.password(), req.email());
+    public AuthData register(UserData user) throws DataAccessException {
+        if (user.username() == null || user.password() == null || user.email() == null) {
+            throw new DataAccessException("bad request");
+        }
         if (userDAO.getUser(user) == null) {
             userDAO.createUser(user);
             AuthData newAuth = new AuthData("", user.username());
-            AuthData returnAuth = authDAO.createAuth(newAuth);
-            return new RegisterResult(true, null, returnAuth.username(),
-                    returnAuth.authToken());
+            return authDAO.createAuth(newAuth);
+
         } else {
-            throw new DataAccessException("User already exists");
+            throw new DataAccessException("already taken");
         }
     }
     public AuthData login(UserData user) throws DataAccessException {

@@ -1,4 +1,4 @@
 package server.results;
 
-public record RegisterResult(boolean success, String message, String username,
+public record RegisterResult(String message, String username,
                              String authToken) {}

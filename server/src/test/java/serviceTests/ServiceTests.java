@@ -24,7 +24,6 @@ public class ServiceTests {
 
     @Test
     void registerSuccess() throws DataAccessException {
-        RegisterRequest =
         UserData userData = new UserData("u", "p", "e");
         AuthData newToken = userService.register(userData);
         AuthData storedToken = authDAO.getAuth(newToken);
