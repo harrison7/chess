@@ -33,6 +33,10 @@ public class Server {
 
         //Spark.webSocket("/connect", webSocketHandler);
 
+        Spark.delete("/db", (req, res) -> {
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.clear(req, res);
+        });
         Spark.post("/user", (req, res) -> {
             ServerHandler handler = ServerHandler.getInstance();
             return handler.register(req, res);
@@ -42,10 +46,7 @@ public class Server {
         Spark.delete("/pet/:id", this::deletePet);
         Spark.delete("/pet", this::deleteAllPets);
         Spark.exception(ResponseException.class, this::exceptionHandler);*/
-        Spark.delete("/db", (req, res) -> {
-            ServerHandler handler = ServerHandler.getInstance();
-            return handler.clear(req, res);
-        });
+
 
 
         Spark.init();
