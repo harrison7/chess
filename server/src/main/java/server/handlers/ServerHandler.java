@@ -2,13 +2,16 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataAccess.*;
+import model.AuthData;
 import model.UserData;
 import server.requests.*;
 import server.results.*;
 import service.ClearService;
+import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ServerHandler {
@@ -77,27 +80,50 @@ public class ServerHandler {
             if (Objects.equals(e.getMessage(), "unauthorized")) {
                 res.status(401);
             }
-            return gson.toJson(new RegisterResult("Error: " + e.getMessage(), null, null));
+            return gson.toJson(new LoginResult("Error: " + e.getMessage(), null, null));
         }
     }
 
     public String logout(Request req, Response res) {
         var gson = new Gson();
-        LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
-        var user = new UserData(request.username(), request.password(), "");
+
+        var request = new LogoutRequest(req.headers("Authorization"));
+        //LogoutRequest request = gson.fromJson(req.headers("Authorization"), LogoutRequest.class);
+        var auth = new AuthData(request.authorization(), "");
 
         UserService service = new UserService(userDAO, authDAO);
 
         try {
-            var auth = service.login(user);
-            var result = new LoginResult(null, auth.username(), auth.authToken());
+            service.logout(auth);
+            var result = new LogoutResult(null);
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
             if (Objects.equals(e.getMessage(), "unauthorized")) {
                 res.status(401);
             }
-            return gson.toJson(new RegisterResult("Error: " + e.getMessage(), null, null));
+            return gson.toJson(new LogoutResult("Error: " + e.getMessage()));
+        }
+    }
+
+    public String listGames(Request req, Response res) {
+        var gson = new Gson();
+
+        var request = new listGamesRequest(req.headers("Authorization"));
+        var auth = new AuthData(request.authorization(), "");
+
+        GameService service = new GameService(gameDAO, authDAO);
+
+        try {
+            var list = service.listGames(auth);
+            var result = new listGamesResult(null, list.values());
+            res.status(200);
+            return gson.toJson(result);
+        } catch (DataAccessException e) {
+            if (Objects.equals(e.getMessage(), "unauthorized")) {
+                res.status(401);
+            }
+            return gson.toJson(new LogoutResult("Error: " + e.getMessage()));
         }
     }
 }

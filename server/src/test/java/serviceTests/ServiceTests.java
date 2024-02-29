@@ -93,9 +93,6 @@ public class ServiceTests {
         Assertions.assertThrows(DataAccessException.class, () -> {
             userService.logout(new AuthData("", "u"));
         });
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            userService.logout(new AuthData(authData.authToken(), "bruh"));
-        });
     }
 
     @Test

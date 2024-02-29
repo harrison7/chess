@@ -46,6 +46,11 @@ public class Server {
             return handler.logout(req, res);
         });
 
+        Spark.get("/game", (req, res) -> {
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.listGames(req, res);
+        });
+
         Spark.delete("/db", (req, res) -> {
             ServerHandler handler = ServerHandler.getInstance();
             return handler.clear(req, res);
