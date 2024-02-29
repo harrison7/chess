@@ -26,15 +26,11 @@ public class MemoryAuthDAO implements AuthDAO {
         authList = new HashMap<>();
     };
     public AuthData createAuth(AuthData auth) throws DataAccessException {
-        if (authList.containsKey(auth.username())) {
-            throw new DataAccessException("User is already authenticated");
-        } else {
-            String authToken = UUID.randomUUID().toString();
-            AuthData newToken = new AuthData(authToken, auth.username());
+        String authToken = UUID.randomUUID().toString();
+        AuthData newToken = new AuthData(authToken, auth.username());
 
-            authList.put(auth.username(), newToken);
-            return newToken;
-        }
+        authList.put(auth.username(), newToken);
+        return newToken;
     };
     public AuthData getAuth(AuthData auth) throws DataAccessException {
         if (authList.containsKey(auth.username())) {

@@ -33,21 +33,23 @@ public class Server {
 
         //Spark.webSocket("/connect", webSocketHandler);
 
-        Spark.delete("/db", (req, res) -> {
-            ServerHandler handler = ServerHandler.getInstance();
-            return handler.clear(req, res);
-        });
         Spark.post("/user", (req, res) -> {
             ServerHandler handler = ServerHandler.getInstance();
             return handler.register(req, res);
         });
-        /*Spark.post("/pet", this::addPet);
-        Spark.get("/pet", this::listPets);
-        Spark.delete("/pet/:id", this::deletePet);
-        Spark.delete("/pet", this::deleteAllPets);
-        Spark.exception(ResponseException.class, this::exceptionHandler);*/
+        Spark.post("/session", (req, res) -> {
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.login(req, res);
+        });
+        Spark.delete("/session", (req, res) -> {
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.logout(req, res);
+        });
 
-
+        Spark.delete("/db", (req, res) -> {
+            ServerHandler handler = ServerHandler.getInstance();
+            return handler.clear(req, res);
+        });
 
         Spark.init();
         Spark.awaitInitialization();
@@ -62,20 +64,4 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
-
-    private Object clear(Request req, Response res) throws DataAccessException {
-        clearService.clear();
-        res.status(204);
-        return "bruh";
-    }
-
-    /*private Object login(Request req, Response res) throws DataAccessException {
-        LoginRequest request = (LoginRequest)gson.fromJson(reqData, LoginRequest.class);
-
-        UserService service = new UserService();
-        LoginResult result = service.login(request);
-
-        return gson.toJson(result);
-
-    }*/
 }

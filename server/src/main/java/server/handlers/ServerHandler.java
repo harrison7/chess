@@ -3,10 +3,8 @@ package server.handlers;
 import com.google.gson.Gson;
 import dataAccess.*;
 import model.UserData;
-import server.requests.ClearRequest;
-import server.requests.RegisterRequest;
-import server.results.ClearResult;
-import server.results.RegisterResult;
+import server.requests.*;
+import server.results.*;
 import service.ClearService;
 import service.UserService;
 import spark.*;
@@ -40,7 +38,7 @@ public class ServerHandler {
         return gson.toJson(result);
     }
 
-    public String register(Request req, Response res) throws DataAccessException {
+    public String register(Request req, Response res) {
         var gson = new Gson();
         RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
         var user = new UserData(request.username(), request.password(), request.email());
@@ -59,6 +57,46 @@ public class ServerHandler {
                 res.status(403);
             }
 
+            return gson.toJson(new RegisterResult("Error: " + e.getMessage(), null, null));
+        }
+    }
+
+    public String login(Request req, Response res) {
+        var gson = new Gson();
+        LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
+        var user = new UserData(request.username(), request.password(), "");
+
+        UserService service = new UserService(userDAO, authDAO);
+
+        try {
+            var auth = service.login(user);
+            var result = new LoginResult(null, auth.username(), auth.authToken());
+            res.status(200);
+            return gson.toJson(result);
+        } catch (DataAccessException e) {
+            if (Objects.equals(e.getMessage(), "unauthorized")) {
+                res.status(401);
+            }
+            return gson.toJson(new RegisterResult("Error: " + e.getMessage(), null, null));
+        }
+    }
+
+    public String logout(Request req, Response res) {
+        var gson = new Gson();
+        LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
+        var user = new UserData(request.username(), request.password(), "");
+
+        UserService service = new UserService(userDAO, authDAO);
+
+        try {
+            var auth = service.login(user);
+            var result = new LoginResult(null, auth.username(), auth.authToken());
+            res.status(200);
+            return gson.toJson(result);
+        } catch (DataAccessException e) {
+            if (Objects.equals(e.getMessage(), "unauthorized")) {
+                res.status(401);
+            }
             return gson.toJson(new RegisterResult("Error: " + e.getMessage(), null, null));
         }
     }

@@ -6,6 +6,7 @@ import server.requests.RegisterRequest;
 import server.results.RegisterResult;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class UserService {
     UserDAO userDAO;
@@ -30,11 +31,10 @@ public class UserService {
     }
     public AuthData login(UserData user) throws DataAccessException {
         if (userDAO.getUser(user) != null) {
-            userDAO.getUser(user);
             AuthData newAuth = new AuthData("", user.username());
             return authDAO.createAuth(newAuth);
         } else {
-            throw new DataAccessException("User does not exist");
+            throw new DataAccessException("unauthorized");
         }
     }
     public void logout(AuthData auth) throws DataAccessException {

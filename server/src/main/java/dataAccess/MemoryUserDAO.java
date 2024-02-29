@@ -35,7 +35,7 @@ public class MemoryUserDAO implements UserDAO {
         UserData returnUser = userList.getOrDefault(user.username(), null);
         if (returnUser != null &&
                 !Objects.equals(returnUser.password(), user.password())) {
-            throw new DataAccessException("Wrong password");
+            throw new DataAccessException("unauthorized");
         } else {
             return returnUser;
         }
