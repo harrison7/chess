@@ -8,44 +8,23 @@ import chess.ChessPosition;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class RookMovesCalculator {
+public class RookMovesCalculator extends MovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor opponent) {
-        ArrayList<ChessMove> potentialMoves = new ArrayList<>();
+        potentialMoves = new ArrayList<>();
         // for each possible move on board starting from myPosition, add to PotentialMoves
-        boolean[] paths = {true, true, true, true};
-        int[] rowDistance = {1, 0, -1, 0};
-        int[] colDistance = {0, 1, 0, -1};
-        int distanceMulti = 1;
+        paths = new boolean[]{true, true, true, true};
+        rowDistance = new int[]{1, 0, -1, 0};
+        colDistance = new int[]{0, 1, 0, -1};
+        distanceMulti = 1;
 
         checkPaths(paths, myPosition);
 
-        while (paths[0] || paths[1] || paths[2] || paths[3]) {
-            for (int i = 0; i < 4; i++) {
-                int moveRow = myPosition.getRow() +
-                        (rowDistance[i] * distanceMulti);
-                int moveCol = myPosition.getColumn() +
-                        (colDistance[i] * distanceMulti);
-                ChessPosition moveIdea = new ChessPosition(moveRow, moveCol);
-                checkPaths(paths, moveIdea);
-                if (paths[i]) {
-                    if (board.getPiece(moveIdea) != null &&
-                            board.getPiece(moveIdea).getTeamColor() == opponent) {
-                        potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
-                        paths[i] = false;
-                    }
-                    if (board.getPiece(moveIdea) == null) {
-                        potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
-                    } else {
-                        paths[i] = false;
-                    }
-                }
-            }
-            distanceMulti++;
-        }
+        checkFourDirections(myPosition, board, opponent);
         return potentialMoves;
     }
 
-    private void checkPaths(boolean[] paths, ChessPosition myPosition) {
+    @Override
+    protected void checkPaths(boolean[] paths, ChessPosition myPosition) {
         if (myPosition.getRow() > 8) {
             paths[0] = false;
         } if (myPosition.getRow() < 1) {

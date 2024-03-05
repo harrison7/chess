@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class KnightMovesCalculator {
+public class KnightMovesCalculator extends MovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor opponent) {
         ArrayList<ChessMove> potentialMoves = new ArrayList<>();
         // for each possible move on board starting from myPosition, add to PotentialMoves
@@ -26,25 +26,16 @@ public class KnightMovesCalculator {
             int moveCol = myPosition.getColumn() + colDistance[i];
             ChessPosition moveIdea = new ChessPosition(moveRow, moveCol);
             //checkPaths(paths, moveIdea);
-            if (paths[i]) {
-                if (board.getPiece(moveIdea) != null &&
-                        board.getPiece(moveIdea).getTeamColor() == opponent) {
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
-                    paths[i] = false;
-                }
-                if (board.getPiece(moveIdea) == null) {
-                    potentialMoves.add(new ChessMove(myPosition, moveIdea, null));
-                } else {
-                    paths[i] = false;
-                }
-            }
+            paths[i] = checkPath(paths[i], board, moveIdea, opponent, potentialMoves,
+                    myPosition);
         }
         //distanceMulti++;
         //}
         return potentialMoves;
     }
 
-    private void checkPaths(boolean[] paths, ChessPosition myPosition) {
+    @Override
+    protected void checkPaths(boolean[] paths, ChessPosition myPosition) {
         if (myPosition.getRow() > 6) {
             paths[0] = false;
             paths[1] = false;
