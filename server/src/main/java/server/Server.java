@@ -1,6 +1,9 @@
 package server;
 
 import dataAccess.*;
+import dataAccess.memoryDAOs.MemoryAuthDAO;
+import dataAccess.memoryDAOs.MemoryGameDAO;
+import dataAccess.memoryDAOs.MemoryUserDAO;
 import server.handlers.ServerHandler;
 import service.ClearService;
 import service.GameService;

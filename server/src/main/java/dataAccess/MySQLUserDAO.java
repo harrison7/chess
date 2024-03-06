@@ -1,58 +1,89 @@
 package dataAccess;
 
+import com.google.gson.Gson;
 import model.UserData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 public class MySQLUserDAO implements UserDAO {
+    private static MySQLUserDAO instance;
     public MySQLUserDAO() throws DataAccessException {
         configureDatabase();
     }
-    public void clear() {
+    public static synchronized MySQLUserDAO getInstance() throws DataAccessException {
+        if (instance == null) {
+            instance = new MySQLUserDAO();
+        }
+        return instance;
+    }
 
+    public void clear() throws DataAccessException {
+        var statement = "TRUNCATE user";
+        executeUpdate(statement);
     }
     public void createUser(UserData user) throws DataAccessException {
-
+        var statement = "INSERT INTO user (username, password, email, json) VALUES (?, ?, ?, ?)";
+        var json = new Gson().toJson(user);
+        var id = executeUpdate(statement, user.username(), user.password(), user.email(), json);
+        //return new UserData(id, user.password(), user.email());
     }
     public UserData getUser(UserData user) throws DataAccessException {
-        return user;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, json FROM user WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, user.username());
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
     }
 
-    private int executeUpdate(String statement, Object... params) throws ResponseException {
+    private UserData readUser(ResultSet rs) throws SQLException {
+        var username = rs.getString("username");
+        var json = rs.getString("json");
+        var user = new Gson().fromJson(json, UserData.class);
+        return new UserData(username, user.password(), user.email());
+    }
+
+    private String executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
 
                 var rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    return rs.getString(1);
                 }
 
-                return 0;
+                return "";
             }
         } catch (SQLException e) {
-            throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS  user (
-              `id` int NOT NULL AUTO_INCREMENT,
               `username` varchar(256) NOT NULL,
               `password` varchar(256) NOT NULL,
               `email` varchar(256) NOT NULL,
-              PRIMARY KEY (`id`),
+              PRIMARY KEY (`username`),
               INDEX(username),
               INDEX(email)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

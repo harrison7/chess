@@ -2,6 +2,8 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataAccess.*;
+import dataAccess.memoryDAOs.MemoryAuthDAO;
+import dataAccess.memoryDAOs.MemoryGameDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -17,20 +19,22 @@ import java.util.Objects;
 public class ServerHandler {
 
     private static ServerHandler instance;
-    protected MemoryUserDAO userDAO = MemoryUserDAO.getInstance();
+    protected MySQLUserDAO userDAO;
     protected MemoryAuthDAO authDAO = MemoryAuthDAO.getInstance();
     protected MemoryGameDAO gameDAO = MemoryGameDAO.getInstance();
 
-    public ServerHandler() {}
+    public ServerHandler() throws DataAccessException {
+        userDAO = MySQLUserDAO.getInstance();
+    }
 
-    public static synchronized ServerHandler getInstance() {
+    public static synchronized ServerHandler getInstance() throws DataAccessException {
         if (instance == null) {
             instance = new ServerHandler();
         }
         return instance;
     }
 
-    public String clear(Request req, Response res) {
+    public String clear(Request req, Response res) throws DataAccessException {
         var gson = new Gson();
         ClearRequest request = gson.fromJson(req.body(), ClearRequest.class);
 

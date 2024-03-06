@@ -1,6 +1,7 @@
-package dataAccess;
+package dataAccess.memoryDAOs;
 
-import chess.ChessGame;
+import dataAccess.DataAccessException;
+import dataAccess.GameDAO;
 import model.AuthData;
 import model.GameData;
 

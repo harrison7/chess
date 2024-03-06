@@ -2,9 +2,11 @@ package serviceTests;
 
 import chess.ChessGame;
 import dataAccess.*;
+import dataAccess.memoryDAOs.MemoryAuthDAO;
+import dataAccess.memoryDAOs.MemoryGameDAO;
+import dataAccess.memoryDAOs.MemoryUserDAO;
 import model.*;
 import org.junit.jupiter.api.*;
-import server.requests.RegisterRequest;
 import service.*;
 
 public class ServiceTests {

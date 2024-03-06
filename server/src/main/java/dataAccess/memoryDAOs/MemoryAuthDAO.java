@@ -1,7 +1,8 @@
-package dataAccess;
+package dataAccess.memoryDAOs;
 
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
 import model.AuthData;
-import server.handlers.ServerHandler;
 
 import java.util.HashMap;
 import java.util.UUID;
