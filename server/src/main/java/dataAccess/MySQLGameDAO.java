@@ -39,6 +39,7 @@ public class MySQLGameDAO implements GameDAO {
         var json = new Gson().toJson(game.game());
         var id = executeUpdate(statement, game.whiteUsername(), game.blackUsername(),
                 game.gameName(), json);
+        System.out.println(id);
         return new GameData(id, game.whiteUsername(), game.blackUsername(),
                 game.gameName(), game.game());
     }
@@ -90,15 +91,12 @@ public class MySQLGameDAO implements GameDAO {
     public Map<Integer, GameData> listGames() throws DataAccessException {
         var result = new HashMap<Integer, GameData>();
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id FROM game";
+            var statement = "SELECT * FROM game";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        var gameData = new GameData(readGame(rs).gameID(),
-                                readGame(rs).whiteUsername(),
-                                readGame(rs).blackUsername(),
-                                readGame(rs).gameName(), readGame(rs).game());
-                        result.put(readGame(rs).gameID(), gameData);
+                        var gameData = readGame(rs);
+                        result.put(gameData.gameID(), gameData);
                     }
                 }
             }
@@ -143,7 +141,7 @@ public class MySQLGameDAO implements GameDAO {
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  user (
+            CREATE TABLE IF NOT EXISTS  game (
               `id` int NOT NULL AUTO_INCREMENT,
               `white_username` varchar(256),
               `black_username` varchar(256),

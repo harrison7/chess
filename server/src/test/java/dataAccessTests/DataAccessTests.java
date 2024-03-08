@@ -1,7 +1,7 @@
 package dataAccessTests;
 
 import dataAccess.*;
-import dataAccess.memoryDAOs.MemoryUserDAO;
+import dataAccess.memoryDAOs.*;
 import model.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,6 +16,26 @@ public class DataAccessTests {
             db = new MySQLUserDAO();
         } else {
             db = new MemoryUserDAO();
+        }
+        db.clear();
+        return db;
+    }
+    private AuthDAO getAuthDAO(Class<? extends AuthDAO> databaseClass) throws DataAccessException {
+        AuthDAO db;
+        if (databaseClass.equals(MySQLAuthDAO.class)) {
+            db = new MySQLAuthDAO();
+        } else {
+            db = new MemoryAuthDAO();
+        }
+        db.clear();
+        return db;
+    }
+    private GameDAO getGameDAO(Class<? extends GameDAO> databaseClass) throws DataAccessException {
+        GameDAO db;
+        if (databaseClass.equals(MySQLGameDAO.class)) {
+            db = new MySQLGameDAO();
+        } else {
+            db = new MemoryGameDAO();
         }
         db.clear();
         return db;
@@ -75,5 +95,21 @@ public class DataAccessTests {
         assertThrows(DataAccessException.class, () -> dataAccess.getUser(wrongUser));
     }
 
+    @ParameterizedTest
+    @ValueSource(classes = {MySQLAuthDAO.class, MemoryAuthDAO.class})
+    void createAuthSuccess(Class<? extends AuthDAO> dbClass) throws DataAccessException {
+        AuthDAO dataAccess = getAuthDAO(dbClass);
 
+        var auth = new AuthData("", "username");
+        assertDoesNotThrow(() -> dataAccess.createAuth(auth));
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySQLAuthDAO.class/*, MemoryAuthDAO.class*/})
+    void createAuthFail(Class<? extends AuthDAO> dbClass) throws DataAccessException {
+        AuthDAO dataAccess = getAuthDAO(dbClass);
+
+        var auth = new AuthData("", "username");
+        assertDoesNotThrow(() -> dataAccess.createAuth(auth));
+    }
 }
