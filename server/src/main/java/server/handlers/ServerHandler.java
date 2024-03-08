@@ -20,11 +20,13 @@ public class ServerHandler {
 
     private static ServerHandler instance;
     protected MySQLUserDAO userDAO;
-    protected MemoryAuthDAO authDAO = MemoryAuthDAO.getInstance();
-    protected MemoryGameDAO gameDAO = MemoryGameDAO.getInstance();
+    protected MySQLAuthDAO authDAO;
+    protected MySQLGameDAO gameDAO;
 
     public ServerHandler() throws DataAccessException {
         userDAO = MySQLUserDAO.getInstance();
+        authDAO = MySQLAuthDAO.getInstance();
+        gameDAO = MySQLGameDAO.getInstance();
     }
 
     public static synchronized ServerHandler getInstance() throws DataAccessException {
