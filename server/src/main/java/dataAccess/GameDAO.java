@@ -7,7 +7,7 @@ import model.GameData;
 import java.util.Map;
 
 public interface GameDAO {
-    public void clear();
+    public void clear() throws DataAccessException;
     public GameData createGame(GameData game) throws DataAccessException;
     public GameData getGame(GameData game) throws DataAccessException;
     public Map<Integer, GameData> listGames() throws DataAccessException;

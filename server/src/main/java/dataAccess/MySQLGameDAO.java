@@ -2,11 +2,17 @@ package dataAccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -27,13 +33,14 @@ public class MySQLGameDAO implements GameDAO {
         var statement = "TRUNCATE game";
         executeUpdate(statement);
     }
-    public void createGame(GameData game) throws DataAccessException {
+    public GameData createGame(GameData game) throws DataAccessException {
         var statement = "INSERT INTO game (white_username, black_username, name, " +
                 "chess_game, json) VALUES (?, ?, ?, ?, ?)";
         var json = new Gson().toJson(game.game());
         var id = executeUpdate(statement, game.whiteUsername(), game.blackUsername(),
                 game.gameName(), json);
-        //return new UserData(id, user.password(), user.email());
+        return new GameData(id, game.whiteUsername(), game.blackUsername(),
+                game.gameName(), game.game());
     }
     public GameData getGame(GameData game) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -50,6 +57,55 @@ public class MySQLGameDAO implements GameDAO {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
         return null;
+    }
+
+    public GameData updateGame(GameData game, AuthData auth, String clientColor)
+            throws DataAccessException {
+        GameData updatedGame;
+        var trueGame = getGame(game);
+        if (clientColor == null) {
+            return getGame(game);
+        } else if ((clientColor.equals("WHITE") && trueGame.whiteUsername() != null) ||
+                (clientColor.equals("BLACK") && trueGame.blackUsername() != null)){
+            throw new DataAccessException("already taken");
+        } else if (clientColor.equals("WHITE")) {
+            updatedGame = new GameData(trueGame.gameID(), auth.username(),
+                    trueGame.blackUsername(), trueGame.gameName(), trueGame.game());
+        } else if (clientColor.equals("BLACK")) {
+            updatedGame = new GameData(trueGame.gameID(), trueGame.whiteUsername(),
+                    auth.username(), trueGame.gameName(), trueGame.game());
+        } else {
+            throw new DataAccessException("wrong color");
+        }
+        var statement = "UPDATE game SET white_username=?, black_username=?, " +
+                "name=?, chess_game=?, json=? WHERE id=?";
+        var json = new Gson().toJson(updatedGame.game());
+        var id = executeUpdate(statement, updatedGame.whiteUsername(),
+                updatedGame.blackUsername(), updatedGame.gameName(), json);
+        return new GameData(id, updatedGame.whiteUsername(),
+                updatedGame.blackUsername(), updatedGame.gameName(),
+                updatedGame.game());
+    };
+
+    public Map<Integer, GameData> listGames() throws DataAccessException {
+        var result = new HashMap<Integer, GameData>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT id FROM game";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        var gameData = new GameData(readGame(rs).gameID(),
+                                readGame(rs).whiteUsername(),
+                                readGame(rs).blackUsername(),
+                                readGame(rs).gameName(), readGame(rs).game());
+                        result.put(readGame(rs).gameID(), gameData);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return result;
     }
 
     private GameData readGame(ResultSet rs) throws SQLException {

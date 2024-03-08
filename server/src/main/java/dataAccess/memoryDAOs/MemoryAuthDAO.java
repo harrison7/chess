@@ -23,7 +23,7 @@ public class MemoryAuthDAO implements AuthDAO {
         return instance;
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() {
         authList = new HashMap<>();
     };
     public AuthData createAuth(AuthData auth) throws DataAccessException {
