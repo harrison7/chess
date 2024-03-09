@@ -17,7 +17,7 @@ import java.util.Map;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class MySQLGameDAO implements GameDAO {
+public class MySQLGameDAO extends HelperGameDAO {
     private static MySQLGameDAO instance;
     public MySQLGameDAO() throws DataAccessException {
         configureDatabase();
@@ -29,10 +29,12 @@ public class MySQLGameDAO implements GameDAO {
         return instance;
     }
 
+    @Override
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE game";
         executeUpdate(statement);
     }
+    @Override
     public GameData createGame(GameData game) throws DataAccessException {
         var statement = "INSERT INTO game (whiteUsername, blackUsername, name, " +
                 " json) VALUES (?, ?, ?, ?)";
@@ -42,6 +44,7 @@ public class MySQLGameDAO implements GameDAO {
         return new GameData(id, game.whiteUsername(), game.blackUsername(),
                 game.gameName(), game.game());
     }
+    @Override
     public GameData getGame(GameData game) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM game WHERE id=?";
@@ -58,25 +61,14 @@ public class MySQLGameDAO implements GameDAO {
         }
         return null;
     }
-
+    @Override
     public GameData updateGame(GameData game, AuthData auth, String clientColor)
             throws DataAccessException {
-        GameData updatedGame;
         var trueGame = getGame(game);
         if (clientColor == null) {
-            return getGame(game);
-        } else if ((clientColor.equals("WHITE") && trueGame.whiteUsername() != null) ||
-                (clientColor.equals("BLACK") && trueGame.blackUsername() != null)){
-            throw new DataAccessException("already taken");
-        } else if (clientColor.equals("WHITE")) {
-            updatedGame = new GameData(trueGame.gameID(), auth.username(),
-                    trueGame.blackUsername(), trueGame.gameName(), trueGame.game());
-        } else if (clientColor.equals("BLACK")) {
-            updatedGame = new GameData(trueGame.gameID(), trueGame.whiteUsername(),
-                    auth.username(), trueGame.gameName(), trueGame.game());
-        } else {
-            throw new DataAccessException("wrong color");
+            return trueGame;
         }
+        GameData updatedGame = updateGameHelper(trueGame, auth, clientColor);
         var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, " +
                 "name=?, json=? WHERE id=?";
         var json = new Gson().toJson(updatedGame.game());
@@ -86,7 +78,7 @@ public class MySQLGameDAO implements GameDAO {
                 updatedGame.blackUsername(), updatedGame.gameName(),
                 updatedGame.game());
     };
-
+    @Override
     public Collection<GameData> listGames() throws DataAccessException {
         var result = new ArrayList<GameData>();
         try (var conn = DatabaseManager.getConnection()) {

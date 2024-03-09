@@ -2,12 +2,13 @@ package dataAccess.memoryDAOs;
 
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
+import dataAccess.HelperGameDAO;
 import model.AuthData;
 import model.GameData;
 
 import java.util.*;
 
-public class MemoryGameDAO implements GameDAO {
+public class MemoryGameDAO extends HelperGameDAO {
     private static MemoryGameDAO instance;
     private ArrayList<GameData> gameList;
 
@@ -22,6 +23,7 @@ public class MemoryGameDAO implements GameDAO {
         return instance;
     }
 
+    @Override
     public void clear() {
         gameList = new ArrayList<>();
     };
@@ -38,6 +40,7 @@ public class MemoryGameDAO implements GameDAO {
         gameList.add(newGame);
         return newGame;
     };
+    @Override
     public GameData getGame(GameData game) throws DataAccessException {
         if (gameList.contains(game)) {
             var trueGame = gameList.get(game.gameID() - 1);
@@ -56,9 +59,11 @@ public class MemoryGameDAO implements GameDAO {
             throw new DataAccessException("Game does not exist");
         }
     };
+    @Override
     public Collection<GameData> listGames() {
         return gameList;
     };
+    @Override
     public GameData updateGame(GameData game, AuthData auth, String clientColor)
             throws DataAccessException {
         GameData updatedGame;
@@ -66,18 +71,8 @@ public class MemoryGameDAO implements GameDAO {
         if (trueGame.gameID() > 0) {
             if (clientColor == null) {
                 return getGame(game);
-            } else if ((clientColor.equals("WHITE") && trueGame.whiteUsername() != null) ||
-                    (clientColor.equals("BLACK") && trueGame.blackUsername() != null)){
-                throw new DataAccessException("already taken");
-            } else if (clientColor.equals("WHITE")) {
-                updatedGame = new GameData(trueGame.gameID(), auth.username(),
-                        trueGame.blackUsername(), trueGame.gameName(), trueGame.game());
-            } else if (clientColor.equals("BLACK")) {
-                updatedGame = new GameData(trueGame.gameID(), trueGame.whiteUsername(),
-                        auth.username(), trueGame.gameName(), trueGame.game());
-            } else {
-                throw new DataAccessException("wrong color");
             }
+            updatedGame = updateGameHelper(trueGame, auth, clientColor);
             gameList.remove(trueGame.gameID() - 1);
             gameList.add(updatedGame.gameID() - 1, updatedGame);
             return updatedGame;
