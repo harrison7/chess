@@ -36,24 +36,39 @@ public class MySQLAuthDAO implements AuthDAO {
     }
     public AuthData getAuth(AuthData auth) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT authToken FROM auth WHERE authToken=?";
+            var statement = "SELECT * FROM auth WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, auth.authToken());
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readAuth(rs);
+                    } else {
+                        throw new DataAccessException("unauthorized");
                     }
                 }
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
-        return null;
+        //return null;
     }
 
     public void deleteAuth(AuthData auth) throws DataAccessException {
-        var statement = "DELETE FROM auth WHERE authToken=?";
-        executeUpdate(statement, auth.authToken());
+        var statement = "SELECT authToken FROM auth WHERE authToken=?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, auth.authToken());
+            try (var rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new DataAccessException("unauthorized");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Error checking auth token existence: %s", e.getMessage()));
+        }
+
+        var deleteStatement = "DELETE FROM auth WHERE authToken=?";
+        executeUpdate(deleteStatement, auth.authToken());
     }
 
     private AuthData readAuth(ResultSet rs) throws SQLException {

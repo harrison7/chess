@@ -34,18 +34,17 @@ public class MySQLGameDAO implements GameDAO {
         executeUpdate(statement);
     }
     public GameData createGame(GameData game) throws DataAccessException {
-        var statement = "INSERT INTO game (white_username, black_username, name, " +
-                "chess_game, json) VALUES (?, ?, ?, ?, ?)";
+        var statement = "INSERT INTO game (whiteUsername, blackUsername, name, " +
+                " json) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(game.game());
         var id = executeUpdate(statement, game.whiteUsername(), game.blackUsername(),
                 game.gameName(), json);
-        System.out.println(id);
         return new GameData(id, game.whiteUsername(), game.blackUsername(),
                 game.gameName(), game.game());
     }
     public GameData getGame(GameData game) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id FROM game WHERE id=?";
+            var statement = "SELECT * FROM game WHERE id=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, game.gameID());
                 try (var rs = ps.executeQuery()) {
@@ -78,25 +77,25 @@ public class MySQLGameDAO implements GameDAO {
         } else {
             throw new DataAccessException("wrong color");
         }
-        var statement = "UPDATE game SET white_username=?, black_username=?, " +
-                "name=?, chess_game=?, json=? WHERE id=?";
+        var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, " +
+                "name=?, json=? WHERE id=?";
         var json = new Gson().toJson(updatedGame.game());
         var id = executeUpdate(statement, updatedGame.whiteUsername(),
-                updatedGame.blackUsername(), updatedGame.gameName(), json);
+                updatedGame.blackUsername(), updatedGame.gameName(), json, trueGame.gameID());
         return new GameData(id, updatedGame.whiteUsername(),
                 updatedGame.blackUsername(), updatedGame.gameName(),
                 updatedGame.game());
     };
 
-    public Map<Integer, GameData> listGames() throws DataAccessException {
-        var result = new HashMap<Integer, GameData>();
+    public Collection<GameData> listGames() throws DataAccessException {
+        var result = new ArrayList<GameData>();
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM game";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
                         var gameData = readGame(rs);
-                        result.put(gameData.gameID(), gameData);
+                        result.add(gameData);
                     }
                 }
             }
@@ -108,8 +107,8 @@ public class MySQLGameDAO implements GameDAO {
 
     private GameData readGame(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
-        var whiteUsername = rs.getString("white_username");
-        var blackUsername = rs.getString("black_username");
+        var whiteUsername = rs.getString("whiteUsername");
+        var blackUsername = rs.getString("blackUsername");
         var gameName = rs.getString("name");
         var json = rs.getString("json");
         var game = new Gson().fromJson(json, ChessGame.class);
@@ -143,8 +142,8 @@ public class MySQLGameDAO implements GameDAO {
             """
             CREATE TABLE IF NOT EXISTS  game (
               `id` int NOT NULL AUTO_INCREMENT,
-              `white_username` varchar(256),
-              `black_username` varchar(256),
+              `whiteUsername` varchar(256),
+              `blackUsername` varchar(256),
               `name` varchar(256) NOT NULL,
               `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`),

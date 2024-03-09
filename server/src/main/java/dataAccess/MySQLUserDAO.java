@@ -2,6 +2,7 @@ package dataAccess;
 
 import com.google.gson.Gson;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,20 +28,25 @@ public class MySQLUserDAO implements UserDAO {
     }
     public void createUser(UserData user) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        var id = executeUpdate(statement, user.username(), user.password(), user.email());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(user.password());
+        var id = executeUpdate(statement, user.username(), hashedPassword, user.email());
         //return new UserData(id, user.password(), user.email());
     }
     public UserData getUser(UserData user) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username FROM user WHERE username=?";
+            var statement = "SELECT * FROM user WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, user.username());
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         String storedPassword = rs.getString("password");
-                        String storedEmail = rs.getString("email");
 
-                        if (user.password().equals(storedPassword) && user.email().equals(storedEmail)) {
+                        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+                        boolean match = encoder.matches(user.password(), storedPassword);
+
+                        if (match) {
                             return readUser(rs);
                         } else {
                             throw new DataAccessException("unauthorized");
@@ -56,8 +62,8 @@ public class MySQLUserDAO implements UserDAO {
 
     private UserData readUser(ResultSet rs) throws SQLException {
         var username = rs.getString("username");
-        var password = rs.getString("username");
-        var email = rs.getString("username");
+        var password = rs.getString("password");
+        var email = rs.getString("email");
         return new UserData(username, password, email);
     }
 
@@ -91,6 +97,7 @@ public class MySQLUserDAO implements UserDAO {
               `email` varchar(256),
               PRIMARY KEY (`username`),
               INDEX(username),
+              INDEX(password),
               INDEX(email)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """

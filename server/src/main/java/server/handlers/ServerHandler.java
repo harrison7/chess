@@ -60,9 +60,9 @@ public class ServerHandler {
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "bad request")) {
+            if (e.getMessage().endsWith("bad request")) {
                 res.status(400);
-            } else if (Objects.equals(e.getMessage(), "already taken")) {
+            } else if (e.getMessage().endsWith("already taken")) {
                 res.status(403);
             }
 
@@ -83,7 +83,7 @@ public class ServerHandler {
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "unauthorized")) {
+            if (e.getMessage().endsWith("unauthorized")) {
                 res.status(401);
             }
             return gson.toJson(new LoginResult("Error: " + e.getMessage(), null, null));
@@ -105,7 +105,7 @@ public class ServerHandler {
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "unauthorized")) {
+            if (e.getMessage().endsWith("unauthorized")) {
                 res.status(401);
             }
             return gson.toJson(new LogoutResult("Error: " + e.getMessage()));
@@ -122,11 +122,11 @@ public class ServerHandler {
 
         try {
             var list = service.listGames(auth);
-            var result = new ListGamesResult(null, list.values());
+            var result = new ListGamesResult(null, list);
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "unauthorized")) {
+            if (e.getMessage().endsWith("unauthorized")) {
                 res.status(401);
             }
             return gson.toJson(new ListGamesResult("Error: " + e.getMessage(), null));
@@ -148,7 +148,7 @@ public class ServerHandler {
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "unauthorized")) {
+            if (e.getMessage().endsWith("unauthorized")) {
                 res.status(401);
             }
             return gson.toJson(new CreateGameResult("Error: " + e.getMessage(), null));
@@ -173,11 +173,11 @@ public class ServerHandler {
             res.status(200);
             return gson.toJson(result);
         } catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "bad request")) {
+            if (e.getMessage().endsWith("bad request")) {
                 res.status(400);
-            } else if (Objects.equals(e.getMessage(), "unauthorized")) {
+            } else if (e.getMessage().endsWith("unauthorized")) {
                 res.status(401);
-            } else if (Objects.equals(e.getMessage(), "already taken")) {
+            } else if (e.getMessage().endsWith("already taken")) {
                 res.status(403);
             }
             return gson.toJson(new JoinGameResult("Error: " + e.getMessage()));

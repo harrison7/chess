@@ -5,6 +5,7 @@ import dataAccess.*;
 import model.AuthData;
 import model.GameData;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class GameService {
@@ -16,7 +17,7 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public Map<Integer, GameData> listGames(AuthData auth) throws DataAccessException {
+    public Collection<GameData> listGames(AuthData auth) throws DataAccessException {
         if (authDAO.getAuth(auth).authToken().equals(auth.authToken())) {
             return gameDAO.listGames();
         } else {
