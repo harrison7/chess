@@ -38,7 +38,7 @@ public class MemoryAuthDAO implements AuthDAO {
             return authList.get(auth.authToken());
         } else {
             throw new DataAccessException("unauthorized");
-        }
+        } //unauthorized
     };
     public void deleteAuth(AuthData auth) throws DataAccessException {
         if (authList.containsKey(auth.authToken())) {

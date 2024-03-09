@@ -9,6 +9,7 @@ import model.GameData;
 import java.util.*;
 
 public class MemoryGameDAO extends HelperGameDAO {
+    //Memory class
     private static MemoryGameDAO instance;
     private ArrayList<GameData> gameList;
 
