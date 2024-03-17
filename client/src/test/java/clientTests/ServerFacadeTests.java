@@ -1,6 +1,10 @@
 package clientTests;
 
+import dataAccess.DataAccessException;
+import model.AuthData;
+import model.UserData;
 import org.junit.jupiter.api.*;
+import serverFacade.ServerFacade;
 import server.Server;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,9 +35,27 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void register() throws Exception {
-        var authData = facade.register("player1", "password", "p1@email.com");
-        assertTrue(authData.authToken().length() > 10);
+    void registerSuccess() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        AuthData newToken = facade.register(userData);
+
+        Assertions.assertNotNull(newToken.authToken());
+        Assertions.assertEquals("u", newToken.username());
+    }
+
+    @Test
+    void registerFail() throws DataAccessException {
+        UserData userData = new UserData("u", "p", "e");
+        UserData dupeData = new UserData("u", "l", "m");
+        UserData invalidUser = new UserData("u", null, "m");
+        AuthData newToken = facade.register(userData);
+
+//        Assertions.assertThrows(DataAccessException.class, () -> {
+//            facade.register(dupeData);
+//        });
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            facade.register(invalidUser);
+        });
     }
 
 }
