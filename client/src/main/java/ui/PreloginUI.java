@@ -57,11 +57,13 @@ public class PreloginUI {
 
     public State login(String username, String password) throws IOException, URISyntaxException {
         facade.login(username, password);
+        System.out.printf("Logged in as %s\n", username);
         return POSTLOGIN;
     }
 
     public State register(String username, String password, String email) throws IOException, URISyntaxException {
         facade.register(username, password, email);
+        System.out.printf("Logged in as %s\n", username);
         return POSTLOGIN;
     }
 }
