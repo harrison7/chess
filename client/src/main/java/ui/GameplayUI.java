@@ -45,6 +45,7 @@ public class GameplayUI {
     private String[] whiteHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
     private String[] blackHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
     private String[] whiteCols = {"8", "7", "6", "5", "4", "3", "2", "1"};
+    private String[] blackCols = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
     public GameplayUI(int port) throws URISyntaxException, IOException {
         state = GAMEPLAY;
@@ -56,12 +57,15 @@ public class GameplayUI {
 
         out.print(ERASE_SCREEN);
 
-        drawHeaders(out);
+        drawHeaders(out, whiteHeader);
+        drawTicTacToeBoard(out, whiteBoard, whiteCols);
+        drawHeaders(out, whiteHeader);
 
-        drawTicTacToeBoard(out, whiteBoard);
-        out.print("\n");
-        drawHeaders(out);
-        drawTicTacToeBoard(out, blackBoard);
+        out.println();
+
+        drawHeaders(out, blackHeader);
+        drawTicTacToeBoard(out, blackBoard, blackCols);
+        drawHeaders(out, blackHeader);
 
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
@@ -72,11 +76,10 @@ public class GameplayUI {
         return GAMEPLAY;
     }
 
-    private void drawHeaders(PrintStream out) {
+    private void drawHeaders(PrintStream out, String[] headers) {
 
         setBlack(out);
-
-        String[] headers = { "a", "b", "c", "d", "e", "f", "g", "h" };
+        out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS));
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
 
@@ -84,6 +87,7 @@ public class GameplayUI {
                 out.print(EMPTY.repeat(LINE_WIDTH_IN_CHARS));
             }
         }
+        out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS));
 
         out.println();
     }
@@ -106,11 +110,13 @@ public class GameplayUI {
         setBlack(out);
     }
 
-    private void drawTicTacToeBoard(PrintStream out, String[][] board) {
+    private void drawTicTacToeBoard(PrintStream out, String[][] board, String[] cols) {
 
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-
+            drawHeader(out, cols[boardRow]);
             drawRowOfSquares(boardRow, out, board);
+            drawHeader(out, cols[boardRow]);
+            out.println();
             lightSquare = !lightSquare;
 
             if (boardRow < BOARD_SIZE_IN_SQUARES - 1) {
@@ -152,7 +158,7 @@ public class GameplayUI {
 
                 setBlack(out);
             }
-            out.println();
+
         //}
     }
 
