@@ -4,6 +4,8 @@ import dataAccess.DataAccessException;
 import model.UserData;
 import serverFacade.ServerFacade;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Scanner;
 
 import static ui.State.*;
@@ -11,10 +13,13 @@ import static ui.State.*;
 public class PreloginUI {
 
     private State state;
+    private ServerFacade facade;
 
-    public PreloginUI() {}
+    public PreloginUI(int port) throws URISyntaxException, IOException {
+        facade = new ServerFacade(port);
+    }
 
-    public State run() {
+    public State run() throws IOException, URISyntaxException {
         System.out.printf("\uD83D\uDC51Welcome to 240 chess. Type help to get started.\uD83D\uDC51%n>>> ");
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
@@ -49,11 +54,13 @@ public class PreloginUI {
         return QUIT;
     }
 
-    public State login(String username, String password) {
+    public State login(String username, String password) throws IOException, URISyntaxException {
+        facade.login(username, password);
         return POSTLOGIN;
     }
 
-    public State register(String username, String password, String email) {
+    public State register(String username, String password, String email) throws IOException, URISyntaxException {
+        facade.register(username, password, email);
         return POSTLOGIN;
     }
 }

@@ -16,10 +16,8 @@ import java.util.Map;
 public class ServerFacade {
     private static int port;
     private static AuthData authToken;
-    private State state;
-    public ServerFacade(int port, State state) throws URISyntaxException, IOException {
+    public ServerFacade(int port) throws URISyntaxException, IOException {
         this.port = port;
-        this.state = state;
         URI uri = new URI("http://localhost:" + port + "/db");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("DELETE");
