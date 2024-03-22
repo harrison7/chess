@@ -25,6 +25,9 @@ public class Main {
 
         while (!quit) {
             switch (state) {
+                case QUIT:
+                    quit = true;
+                    break;
                 case PRELOGIN:
                     state = preloginUI.run();
                     break;
@@ -34,5 +37,7 @@ public class Main {
                     break;
             }
         }
+
+        server.stop();
     }
 }
