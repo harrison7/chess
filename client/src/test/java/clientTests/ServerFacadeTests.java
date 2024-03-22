@@ -87,6 +87,7 @@ public class ServerFacadeTests {
     @Test
     void logoutFail() throws URISyntaxException, IOException {
         var authData = facade.register("playerof", "password", "p1@email.com");
+        facade.logout("");
         Assertions.assertThrows(IOException.class, () -> facade.logout(""));
     }
 
@@ -103,6 +104,7 @@ public class ServerFacadeTests {
     void listGamesFail() throws DataAccessException, IOException, URISyntaxException {
         var authData = facade.register("ulistfail", "p", "e");
         facade.createGame(authData.authToken(), "name2");
+        facade.logout("");
 
         Assertions.assertThrows(IOException.class, () -> {
             facade.listGames("");
@@ -120,6 +122,7 @@ public class ServerFacadeTests {
     @Test
     void createGameFail() throws DataAccessException, IOException, URISyntaxException {
         var authData = facade.register("ucreatefail", "p", "e");
+        facade.logout("");
 
         Assertions.assertThrows(IOException.class, () -> {
             facade.createGame("", "newGame");
