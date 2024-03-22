@@ -23,6 +23,7 @@ public class ServerFacadeTests {
 
     @BeforeAll
     public static void init() throws URISyntaxException, IOException {
+
         server = new Server();
         var port = server.run(0);
 

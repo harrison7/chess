@@ -16,6 +16,7 @@ public class PreloginUI {
     private ServerFacade facade;
 
     public PreloginUI(int port) throws URISyntaxException, IOException {
+        state = PRELOGIN;
         facade = new ServerFacade(port);
     }
 
