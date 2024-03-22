@@ -47,13 +47,13 @@ public class ServerFacade {
         writeRequestBody(body.toString(), http);
 
         http.connect();
-        System.out.printf("= Request =========\n[POST] http://localhost:%s/user\n\n%s\n\n", port, body);
+        //System.out.printf("= Request =========\n[POST] http://localhost:%s/user\n\n%s\n\n", port, body);
         RegisterResult res;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             res = new Gson().fromJson(inputStreamReader, RegisterResult.class);
         }
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
 
         return res;
     }
@@ -69,13 +69,13 @@ public class ServerFacade {
         writeRequestBody(body.toString(), http);
 
         http.connect();
-        System.out.printf("= Request =========\n[POST] http://localhost:%s/session\n\n%s\n\n", port, body);
+        //System.out.printf("= Request =========\n[POST] http://localhost:%s/session\n\n%s\n\n", port, body);
         LoginResult res;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             res = new Gson().fromJson(inputStreamReader, LoginResult.class);
         }
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
 
         return res;
     }
@@ -88,13 +88,13 @@ public class ServerFacade {
         http.setRequestProperty("Authorization", authToken);
 
         http.connect();
-        System.out.printf("= Request =========\n[DELETE] http://localhost:%s/session\n\n%s\n\n", port, authToken);
+        //System.out.printf("= Request =========\n[DELETE] http://localhost:%s/session\n\n%s\n\n", port, authToken);
         LogoutResult res;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             res = new Gson().fromJson(inputStreamReader, LogoutResult.class);
         }
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
 
         return res;
     }
@@ -107,13 +107,13 @@ public class ServerFacade {
         http.setRequestProperty("Authorization", authToken);
 
         http.connect();
-        System.out.printf("= Request =========\n[GET] http://localhost:%s/game\n\n%s\n\n", port, authToken);
+        //System.out.printf("= Request =========\n[GET] http://localhost:%s/game\n\n%s\n\n", port, authToken);
         ListGamesResult res;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             res = new Gson().fromJson(inputStreamReader, ListGamesResult.class);
         }
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
 
         return res;
     }
@@ -129,13 +129,13 @@ public class ServerFacade {
         writeRequestBody(body.toString(), http);
 
         http.connect();
-        System.out.printf("= Request =========\n[POST] http://localhost:%s/game\n\n%s\n\n", port, authToken);
+        //System.out.printf("= Request =========\n[POST] http://localhost:%s/game\n\n%s\n\n", port, authToken);
         CreateGameResult res;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             res = new Gson().fromJson(inputStreamReader, CreateGameResult.class);
         }
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
 
         return res;
     }
@@ -152,13 +152,13 @@ public class ServerFacade {
         writeRequestBody(body.toString(), http);
 
         http.connect();
-        System.out.printf("= Request =========\n[PUT] http://localhost:%s/game\n\n%s\n\n", port, authToken);
+        //System.out.printf("= Request =========\n[PUT] http://localhost:%s/game\n\n%s\n\n", port, authToken);
         JoinGameResult res;
         try (InputStream respBody = http.getInputStream()) {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             res = new Gson().fromJson(inputStreamReader, JoinGameResult.class);
         }
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
 
         return res;
     }
@@ -177,7 +177,7 @@ public class ServerFacade {
         var statusMessage = http.getResponseMessage();
 
         Object responseBody = readResponseBody(http);
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", statusCode, statusMessage, responseBody);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", statusCode, statusMessage, responseBody);
         return responseBody;
     }
 

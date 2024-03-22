@@ -21,7 +21,7 @@ public class PreloginUI {
     }
 
     public State run() throws IOException, URISyntaxException {
-        System.out.printf("\uD83D\uDC51Welcome to 240 chess. Type help to get started.\uD83D\uDC51%n>>> ");
+        System.out.printf("\uD83D\uDC51Welcome to 240 chess. Type help to get started.\uD83D\uDC51%n[LOGGED_OUT] >>> ");
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
         var params = line.split(" ");
