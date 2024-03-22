@@ -66,7 +66,8 @@ public class PostloginUI {
     }
 
     public void create(String name) throws IOException, URISyntaxException {
-        facade.createGame("", name);
+        var id = facade.createGame("", name);
+        System.out.printf("New game ID: %s\n", id.gameID());
     }
 
     public void list() throws IOException, URISyntaxException {
