@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class ServerFacade {
     private static int port;
-    private static AuthData authToken;
+    private static String authToken;
     public ServerFacade(int port) throws URISyntaxException, IOException {
         this.port = port;
         URI uri = new URI("http://localhost:" + port + "/db");
@@ -54,7 +54,7 @@ public class ServerFacade {
             res = new Gson().fromJson(inputStreamReader, RegisterResult.class);
         }
         //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
-
+        authToken = res.authToken();
         return res;
     }
 
@@ -76,7 +76,7 @@ public class ServerFacade {
             res = new Gson().fromJson(inputStreamReader, LoginResult.class);
         }
         //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
-
+        authToken = res.authToken();
         return res;
     }
 
@@ -85,7 +85,7 @@ public class ServerFacade {
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("DELETE");
 
-        http.setRequestProperty("Authorization", authToken);
+        http.setRequestProperty("Authorization", this.authToken);
 
         http.connect();
         //System.out.printf("= Request =========\n[DELETE] http://localhost:%s/session\n\n%s\n\n", port, authToken);
@@ -104,7 +104,7 @@ public class ServerFacade {
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("GET");
 
-        http.setRequestProperty("Authorization", authToken);
+        http.setRequestProperty("Authorization", this.authToken);
 
         http.connect();
         //System.out.printf("= Request =========\n[GET] http://localhost:%s/game\n\n%s\n\n", port, authToken);
@@ -123,7 +123,7 @@ public class ServerFacade {
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("POST");
 
-        http.setRequestProperty("Authorization", authToken);
+        http.setRequestProperty("Authorization", this.authToken);
         JsonObject body = new JsonObject();
         body.addProperty("gameName", gameName);
         writeRequestBody(body.toString(), http);
@@ -145,7 +145,7 @@ public class ServerFacade {
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("PUT");
 
-        http.setRequestProperty("Authorization", authToken);
+        http.setRequestProperty("Authorization", this.authToken);
         JsonObject body = new JsonObject();
         body.addProperty("playerColor", playerColor);
         body.addProperty("gameID", gameID);
