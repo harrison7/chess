@@ -85,7 +85,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void logoutFail() throws URISyntaxException, IOException {
+    void logoutFail() throws URISyntaxException, IOException { //fail
         var authData = facade.register("playerof", "password", "p1@email.com");
         facade.logout("");
         Assertions.assertThrows(IOException.class, () -> facade.logout(""));
