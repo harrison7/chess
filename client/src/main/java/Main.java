@@ -1,4 +1,7 @@
 import chess.*;
+import ui.State;
+
+import static ui.State.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -7,6 +10,18 @@ public class Main {
             serverUrl = args[0];
         }
 
-        new Repl(serverUrl).run();
+        boolean quit = false;
+        State state = PRELOGIN;
+
+        while (!quit) {
+            switch (state) {
+                case PRELOGIN:
+                    break;
+                case POSTLOGIN:
+                    break;
+                case GAMEPLAY:
+                    break;
+            }
+        }
     }
 }
