@@ -4,6 +4,7 @@ import serverFacade.ServerFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.State.*;
@@ -36,7 +37,7 @@ public class PostloginUI {
                 list();
                 break;
             case "join":
-                state = join(params[1], params[2]);
+                state = join(params[1], (params.length == 2) ? null : params[2]);
                 break;
             case "observe":
                 state = observe(params[1]);
