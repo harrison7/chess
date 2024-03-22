@@ -23,24 +23,25 @@ public class GameplayUI {
     private static final String X = "X";
     private static final String O = "O";
 
-    private String[][] whiteBoard =
-            {{"r", "n", "b", "q", "k", "b", "n", "r"},
-            {"p", "p", "p", "p", "p", "p", "p", "p"},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {"P", "P", "P", "P", "P", "P", "P", "P"},
-            {"R", "N", "B", "Q", "K", "B", "N", "R"}};
-    private String[][] blackBoard =
-            {{"R", "N", "B", "Q", "K", "B", "N", "R"},
-            {"P", "P", "P", "P", "P", "P", "P", "P"},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {" ", " ", " ", " ", " ", " ", " ", " "},
-            {"p", "p", "p", "p", "p", "p", "p", "p"},
-            {"r", "n", "b", "q", "k", "b", "n", "r"}};
+    private Character[][] whiteBoard =
+            {{'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'},
+                    {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
+                    {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'}};
+    private Character[][] blackBoard =
+            {{'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
+                    {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
+                    {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'}};
+
 
     private String[] whiteHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
     private String[] blackHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
@@ -110,7 +111,7 @@ public class GameplayUI {
         setBlack(out);
     }
 
-    private void drawTicTacToeBoard(PrintStream out, String[][] board, String[] cols) {
+    private void drawTicTacToeBoard(PrintStream out, Character[][] board, String[] cols) {
 
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             drawHeader(out, cols[boardRow]);
@@ -126,7 +127,7 @@ public class GameplayUI {
         }
     }
 
-    private void drawRowOfSquares(int boardRow, PrintStream out, String[][] board) {
+    private void drawRowOfSquares(int boardRow, PrintStream out, Character[][] board) {
 
         //for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_CHARS; ++squareRow) {
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
@@ -140,9 +141,15 @@ public class GameplayUI {
                 //if (squareRow == SQUARE_SIZE_IN_CHARS / 2) {
                     int prefixLength = SQUARE_SIZE_IN_CHARS / 2;
                     int suffixLength = SQUARE_SIZE_IN_CHARS - prefixLength - 1;
+                    String color;
+                    if (Character.isUpperCase(board[boardRow][boardCol])) {
+                        color = SET_TEXT_COLOR_RED;
+                    } else {
+                        color = SET_TEXT_COLOR_BLUE;
+                    }
 
                     out.print(EMPTY.repeat(prefixLength));
-                    printPlayer(out, board[boardRow][boardCol], lightSquare);
+                    printPlayer(out, board[boardRow][boardCol], lightSquare, color);
                     out.print(EMPTY.repeat(suffixLength));
                     lightSquare = !lightSquare;
                 //}
@@ -191,13 +198,12 @@ public class GameplayUI {
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
-    private void printPlayer(PrintStream out, String player, boolean light) {
+    private void printPlayer(PrintStream out, Character player, boolean light, String team) {
+        out.print(team);
         if (light) {
             out.print(SET_BG_COLOR_WHITE);
-            out.print(SET_TEXT_COLOR_BLACK);
         } else {
             out.print(SET_BG_COLOR_BLACK);
-            out.print(SET_TEXT_COLOR_WHITE);
         }
 
 
