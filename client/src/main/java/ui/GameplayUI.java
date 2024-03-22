@@ -14,7 +14,7 @@ import static ui.State.*;
 public class GameplayUI {
     private State state;
     private ServerFacade facade;
-    private boolean lightSquare;
+    private boolean lightSquare = true;
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_CHARS = 3;
@@ -33,14 +33,14 @@ public class GameplayUI {
                     {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
                     {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'}};
     private Character[][] blackBoard =
-            {{'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
+            {{'R', 'N', 'B', 'K', 'Q', 'B', 'N', 'R'},
                     {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
                     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                     {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
-                    {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'}};
+                    {'r', 'n', 'b', 'k', 'q', 'b', 'n', 'r'}};
 
 
     private String[] whiteHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
