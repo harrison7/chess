@@ -17,7 +17,7 @@ public class GameplayUI {
     private boolean lightSquare;
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static final int SQUARE_SIZE_IN_CHARS = 2;
+    private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final int LINE_WIDTH_IN_CHARS = 0;
     private static final String EMPTY = " ";
     private static final String X = "X";
@@ -41,6 +41,10 @@ public class GameplayUI {
             {" ", " ", " ", " ", " ", " ", " ", " "},
             {"p", "p", "p", "p", "p", "p", "p", "p"},
             {"r", "n", "b", "q", "k", "b", "n", "r"}};
+
+    private String[] whiteHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    private String[] blackHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
+    private String[] whiteCols = {"8", "7", "6", "5", "4", "3", "2", "1"};
 
     public GameplayUI(int port) throws URISyntaxException, IOException {
         state = GAMEPLAY;
@@ -193,6 +197,6 @@ public class GameplayUI {
 
         out.print(player);
 
-        setWhite(out);
+        //setWhite(out);
     }
 }
