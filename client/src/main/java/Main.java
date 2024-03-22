@@ -1,7 +1,6 @@
 import chess.*;
 import server.Server;
-import ui.PreloginUI;
-import ui.State;
+import ui.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,6 +18,8 @@ public class Main {
         }
 
         var preloginUI = new PreloginUI(port);
+        var postloginUI = new PostloginUI(port);
+        var gameplayUI = new GameplayUI(port);
 
         boolean quit = false;
         State state = PRELOGIN;
@@ -32,8 +33,10 @@ public class Main {
                     state = preloginUI.run();
                     break;
                 case POSTLOGIN:
+                    state = postloginUI.run();
                     break;
                 case GAMEPLAY:
+                    state = gameplayUI.run();
                     break;
             }
         }
