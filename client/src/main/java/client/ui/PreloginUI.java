@@ -1,6 +1,6 @@
 package client.ui;
 
-import serverFacade.ServerFacade;
+import facade.ServerFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

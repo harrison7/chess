@@ -1,7 +1,8 @@
 package client.ui;
 
 import com.google.gson.Gson;
-import serverFacade.ServerFacade;
+import facade.ServerFacade;
+import webSocket.NotificationHandler;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -57,25 +58,6 @@ public class GameplayUI {
     public GameplayUI(int port) throws URISyntaxException, IOException {
         state = GAMEPLAY;
         facade = new ServerFacade(port);
-        try {
-            url = url.replace("http", "ws");
-            URI socketURI = new URI(url + "/connect");
-            this.notificationHandler = notificationHandler;
-
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, socketURI);
-
-            //set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
-                    notificationHandler.notify(notification);
-                }
-            });
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new ResponseException(500, ex.getMessage());
-        }
     }
 
     public State run() throws IOException, URISyntaxException {

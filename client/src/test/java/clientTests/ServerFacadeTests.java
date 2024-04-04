@@ -3,7 +3,7 @@ package clientTests;
 import dataAccess.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import serverFacade.ServerFacade;
+import facade.ServerFacade;
 import server.Server;
 
 import java.io.IOException;

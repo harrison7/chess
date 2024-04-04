@@ -4,7 +4,6 @@ import client.ui.PostloginUI;
 import client.ui.PreloginUI;
 import client.ui.State;
 import server.Server;
-import ui.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,11 +19,5 @@ public class Main {
         }
 
         new Repl(port, serverUrl).run();
-
-        var preloginUI = new PreloginUI(port);
-        var postloginUI = new PostloginUI(port);
-        var gameplayUI = new GameplayUI(port);
-
-
     }
 }
