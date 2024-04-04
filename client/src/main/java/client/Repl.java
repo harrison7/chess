@@ -22,12 +22,12 @@ public class Repl implements NotificationHandler {
     private String serverURL;
 
     public Repl(int port, String serverUrl) throws URISyntaxException, IOException {
-        preloginUI = new PreloginUI(port);
-        postloginUI = new PostloginUI(port);
-        gameplayUI = new GameplayUI(port);
-
         this.port = port;
         this.serverURL = serverUrl;
+
+        preloginUI = new PreloginUI(port);
+        postloginUI = new PostloginUI(port);
+        gameplayUI = new GameplayUI(port, serverURL, this);
     }
 
     public void run() throws IOException, URISyntaxException {

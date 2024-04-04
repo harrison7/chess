@@ -2,6 +2,7 @@ package client.ui;
 
 import com.google.gson.Gson;
 import facade.ServerFacade;
+import facade.WebSocketFacade;
 import webSocket.NotificationHandler;
 
 import javax.websocket.*;
@@ -18,11 +19,11 @@ import static client.ui.State.*;
 public class GameplayUI {
     private State state;
     private ServerFacade facade;
+    private final String serverUrl;
+    private final NotificationHandler notificationHandler;
+    private WebSocketFacade ws;
+
     private boolean lightSquare = true;
-
-    Session session;
-    NotificationHandler notificationHandler;
-
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final int LINE_WIDTH_IN_CHARS = 0;
@@ -55,13 +56,16 @@ public class GameplayUI {
     private final String[] whiteCols = {"8", "7", "6", "5", "4", "3", "2", "1"};
     private final String[] blackCols = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
-    public GameplayUI(int port) throws URISyntaxException, IOException {
+    public GameplayUI(int port, String serverURL, NotificationHandler notificationHandler) throws URISyntaxException, IOException {
         state = GAMEPLAY;
         facade = new ServerFacade(port);
+        this.serverUrl = serverURL;
+        this.notificationHandler = notificationHandler;
     }
 
     public State run() throws IOException, URISyntaxException {
         state = GAMEPLAY;
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
 
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
