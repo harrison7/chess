@@ -21,6 +21,8 @@ public class PreloginUI {
     }
 
     public State run() throws IOException, URISyntaxException {
+        state = PRELOGIN;
+
         System.out.printf("\uD83D\uDC51Welcome to 240 chess. Type help to get started.\uD83D\uDC51%n[LOGGED_OUT] >>> ");
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
@@ -56,14 +58,24 @@ public class PreloginUI {
     }
 
     public State login(String username, String password) throws IOException, URISyntaxException {
-        facade.login(username, password);
-        System.out.printf("Logged in as %s\n", username);
-        return POSTLOGIN;
+        try {
+            facade.login(username, password);
+            System.out.printf("Logged in as %s\n", username);
+            return POSTLOGIN;
+        } catch (IOException e) {
+            System.out.printf("Log in fail: %s\n", e);
+            return PRELOGIN;
+        }
     }
 
     public State register(String username, String password, String email) throws IOException, URISyntaxException {
-        facade.register(username, password, email);
-        System.out.printf("Logged in as %s\n", username);
-        return POSTLOGIN;
+        try {
+            facade.register(username, password, email);
+            System.out.printf("Logged in as %s\n", username);
+            return POSTLOGIN;
+        } catch (IOException e) {
+            System.out.printf("Register fail: %s\n", e);
+            return PRELOGIN;
+        }
     }
 }

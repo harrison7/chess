@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -54,6 +55,8 @@ public class GameplayUI {
     }
 
     public State run() throws IOException, URISyntaxException {
+        state = GAMEPLAY;
+
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -73,8 +76,11 @@ public class GameplayUI {
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
-        var params = line.split(" ");
-        return GAMEPLAY;
+        if (Objects.equals(line, "Leave")) {
+            return POSTLOGIN;
+        } else {
+            return GAMEPLAY;
+        }
     }
 
     private void drawHeaders(PrintStream out, String[] headers) {

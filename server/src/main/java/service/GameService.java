@@ -7,6 +7,7 @@ import model.GameData;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 public class GameService {
     GameDAO gameDAO;
@@ -37,6 +38,9 @@ public class GameService {
             throws DataAccessException {
         if (game.gameID() == 0) {
             throw new DataAccessException("bad request");
+        } else if ((gameDAO.getGame(game).whiteUsername() != null && Objects.equals(clientColor, "WHITE")) ||
+                (gameDAO.getGame(game).blackUsername() != null && Objects.equals(clientColor, "BLACK"))) {
+            throw new DataAccessException("already taken");
         } else if (authDAO.getAuth(auth).authToken().equals(auth.authToken()) &&
                 gameDAO.getGame(game).gameID() == game.gameID()) {
             return gameDAO.updateGame(game, auth, clientColor);

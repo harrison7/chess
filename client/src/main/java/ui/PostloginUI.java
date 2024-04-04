@@ -19,6 +19,8 @@ public class PostloginUI {
     }
 
     public State run() throws IOException, URISyntaxException {
+        state = POSTLOGIN;
+
         System.out.print("[LOGGED_IN] >>> ");
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
@@ -47,6 +49,8 @@ public class PostloginUI {
                 break;
             default:
                 System.out.println("Unknown command");
+                state = POSTLOGIN;
+                break;
         }
         return state;
     }
@@ -72,7 +76,12 @@ public class PostloginUI {
     }
 
     public void list() throws IOException, URISyntaxException {
-        facade.listGames("");
+        var list = facade.listGames("");
+        for (var game : list.games()) {
+            System.out.printf("%s, %s, %s, %s", game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName());
+            System.out.println();
+        }
+
     }
 
     public State join(String id, String color) throws IOException, URISyntaxException {
