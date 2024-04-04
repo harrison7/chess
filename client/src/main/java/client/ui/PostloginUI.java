@@ -1,13 +1,12 @@
-package ui;
+package client.ui;
 
 import serverFacade.ServerFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Objects;
 import java.util.Scanner;
 
-import static ui.State.*;
+import static client.ui.State.*;
 
 public class PostloginUI {
     private State state;

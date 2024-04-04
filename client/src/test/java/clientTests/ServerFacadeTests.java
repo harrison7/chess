@@ -1,14 +1,10 @@
 package clientTests;
 
-import chess.ChessGame;
 import dataAccess.DataAccessException;
-import model.AuthData;
-import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import serverFacade.ServerFacade;
 import server.Server;
-import ui.State;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

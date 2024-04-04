@@ -1,14 +1,12 @@
-package ui;
+package client.ui;
 
-import dataAccess.DataAccessException;
-import model.UserData;
 import serverFacade.ServerFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
-import static ui.State.*;
+import static client.ui.State.*;
 
 public class PreloginUI {
 

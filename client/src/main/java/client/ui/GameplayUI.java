@@ -1,21 +1,26 @@
-package ui;
+package client.ui;
 
+import com.google.gson.Gson;
 import serverFacade.ServerFacade;
 
+import javax.websocket.*;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.*;
-import static ui.State.*;
+import static client.ui.State.*;
 
 public class GameplayUI {
     private State state;
     private ServerFacade facade;
     private boolean lightSquare = true;
+
+    Session session;
+    NotificationHandler notificationHandler;
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_CHARS = 3;
@@ -44,14 +49,33 @@ public class GameplayUI {
                     {'r', 'n', 'b', 'k', 'q', 'b', 'n', 'r'}};
 
 
-    private String[] whiteHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
-    private String[] blackHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
-    private String[] whiteCols = {"8", "7", "6", "5", "4", "3", "2", "1"};
-    private String[] blackCols = {"1", "2", "3", "4", "5", "6", "7", "8"};
+    private final String[] whiteHeader = {"a", "b", "c", "d", "e", "f", "g", "h"};
+    private final String[] blackHeader = {"h", "g", "f", "e", "d", "c", "b", "a"};
+    private final String[] whiteCols = {"8", "7", "6", "5", "4", "3", "2", "1"};
+    private final String[] blackCols = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
     public GameplayUI(int port) throws URISyntaxException, IOException {
         state = GAMEPLAY;
         facade = new ServerFacade(port);
+        try {
+            url = url.replace("http", "ws");
+            URI socketURI = new URI(url + "/connect");
+            this.notificationHandler = notificationHandler;
+
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, socketURI);
+
+            //set message handler
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    Notification notification = new Gson().fromJson(message, Notification.class);
+                    notificationHandler.notify(notification);
+                }
+            });
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
     }
 
     public State run() throws IOException, URISyntaxException {
@@ -59,7 +83,7 @@ public class GameplayUI {
 
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-        out.print(ERASE_SCREEN);
+        out.print(EscapeSequences.ERASE_SCREEN);
 
         drawHeaders(out, whiteHeader);
         drawTicTacToeBoard(out, whiteBoard, whiteCols);
@@ -71,8 +95,8 @@ public class GameplayUI {
         drawTicTacToeBoard(out, blackBoard, blackCols);
         drawHeaders(out, blackHeader);
 
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+        out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
@@ -109,8 +133,8 @@ public class GameplayUI {
     }
 
     private void printHeaderText(PrintStream out, String player) {
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_GREEN);
+        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+        out.print(EscapeSequences.SET_TEXT_COLOR_GREEN);
 
         out.print(player);
 
@@ -149,9 +173,9 @@ public class GameplayUI {
                     int suffixLength = SQUARE_SIZE_IN_CHARS - prefixLength - 1;
                     String color;
                     if (Character.isUpperCase(board[boardRow][boardCol])) {
-                        color = SET_TEXT_COLOR_RED;
+                        color = EscapeSequences.SET_TEXT_COLOR_RED;
                     } else {
-                        color = SET_TEXT_COLOR_BLUE;
+                        color = EscapeSequences.SET_TEXT_COLOR_BLUE;
                     }
 
                     out.print(EMPTY.repeat(prefixLength));
@@ -190,26 +214,26 @@ public class GameplayUI {
     }
 
     private void setWhite(PrintStream out) {
-        out.print(SET_BG_COLOR_WHITE);
-        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+        out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
     }
 
     private void setRed(PrintStream out) {
-        out.print(SET_BG_COLOR_RED);
-        out.print(SET_TEXT_COLOR_RED);
+        out.print(EscapeSequences.SET_BG_COLOR_RED);
+        out.print(EscapeSequences.SET_TEXT_COLOR_RED);
     }
 
     private void setBlack(PrintStream out) {
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+        out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
     }
 
     private void printPlayer(PrintStream out, Character player, boolean light, String team) {
         out.print(team);
         if (light) {
-            out.print(SET_BG_COLOR_WHITE);
+            out.print(EscapeSequences.SET_BG_COLOR_WHITE);
         } else {
-            out.print(SET_BG_COLOR_BLACK);
+            out.print(EscapeSequences.SET_BG_COLOR_BLACK);
         }
 
 

@@ -1,11 +1,14 @@
-import chess.*;
+import client.ui.GameplayUI;
+import client.ui.PostloginUI;
+import client.ui.PreloginUI;
+import client.ui.State;
 import server.Server;
 import ui.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static ui.State.*;
+import static client.ui.State.*;
 
 public class Main {
     public static void main(String[] args) throws URISyntaxException, IOException {
