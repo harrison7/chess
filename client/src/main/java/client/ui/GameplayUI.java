@@ -1,14 +1,11 @@
 package client.ui;
 
-import com.google.gson.Gson;
 import facade.ServerFacade;
 import facade.WebSocketFacade;
 import webSocket.NotificationHandler;
 
-import javax.websocket.*;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -63,26 +60,11 @@ public class GameplayUI {
         this.notificationHandler = notificationHandler;
     }
 
-    public State run() throws IOException, URISyntaxException {
+    public State run() throws IOException {
         state = GAMEPLAY;
         ws = new WebSocketFacade(serverUrl, notificationHandler);
 
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-
-        out.print(EscapeSequences.ERASE_SCREEN);
-
-        drawHeaders(out, whiteHeader);
-        drawTicTacToeBoard(out, whiteBoard, whiteCols);
-        drawHeaders(out, whiteHeader);
-
-        out.println();
-
-        drawHeaders(out, blackHeader);
-        drawTicTacToeBoard(out, blackBoard, blackCols);
-        drawHeaders(out, blackHeader);
-
-        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-        out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
+        printBoard();
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
@@ -93,8 +75,26 @@ public class GameplayUI {
         }
     }
 
-    private void drawHeaders(PrintStream out, String[] headers) {
+    private void printBoard() {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
+        out.print(EscapeSequences.ERASE_SCREEN);
+
+        drawHeaders(out, whiteHeader);
+        drawChessBoard(out, whiteBoard, whiteCols);
+        drawHeaders(out, whiteHeader);
+
+        out.println();
+
+        drawHeaders(out, blackHeader);
+        drawChessBoard(out, blackBoard, blackCols);
+        drawHeaders(out, blackHeader);
+
+        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+        out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
+    }
+
+    private void drawHeaders(PrintStream out, String[] headers) {
         setBlack(out);
         out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS));
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
@@ -127,75 +127,45 @@ public class GameplayUI {
         setBlack(out);
     }
 
-    private void drawTicTacToeBoard(PrintStream out, Character[][] board, String[] cols) {
-
+    private void drawChessBoard(PrintStream out, Character[][] board, String[] cols) {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             drawHeader(out, cols[boardRow]);
             drawRowOfSquares(boardRow, out, board);
             drawHeader(out, cols[boardRow]);
             out.println();
             lightSquare = !lightSquare;
-
-            if (boardRow < BOARD_SIZE_IN_SQUARES - 1) {
-                drawVerticalLine(out);
-                setBlack(out);
-            }
         }
     }
 
     private void drawRowOfSquares(int boardRow, PrintStream out, Character[][] board) {
-
-        //for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_CHARS; ++squareRow) {
-            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                if (lightSquare) {
-                    setWhite(out);
-                } else {
-                    setBlack(out);
-                }
-
-
-                //if (squareRow == SQUARE_SIZE_IN_CHARS / 2) {
-                    int prefixLength = SQUARE_SIZE_IN_CHARS / 2;
-                    int suffixLength = SQUARE_SIZE_IN_CHARS - prefixLength - 1;
-                    String color;
-                    if (Character.isUpperCase(board[boardRow][boardCol])) {
-                        color = EscapeSequences.SET_TEXT_COLOR_RED;
-                    } else {
-                        color = EscapeSequences.SET_TEXT_COLOR_BLUE;
-                    }
-
-                    out.print(EMPTY.repeat(prefixLength));
-                    printPlayer(out, board[boardRow][boardCol], lightSquare, color);
-                    out.print(EMPTY.repeat(suffixLength));
-                    lightSquare = !lightSquare;
-                //}
-//                else {
-//                    out.print(EMPTY.repeat(SQUARE_SIZE_IN_CHARS));
-//                }
-
-                if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                    // Draw right line
-                    setRed(out);
-                    out.print(EMPTY.repeat(LINE_WIDTH_IN_CHARS));
-                }
-
+        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            if (lightSquare) {
+                setWhite(out);
+            } else {
                 setBlack(out);
             }
 
-        //}
-    }
+            int prefixLength = SQUARE_SIZE_IN_CHARS / 2;
+            int suffixLength = SQUARE_SIZE_IN_CHARS - prefixLength - 1;
+            String color;
+            if (Character.isUpperCase(board[boardRow][boardCol])) {
+                color = EscapeSequences.SET_TEXT_COLOR_RED;
+            } else {
+                color = EscapeSequences.SET_TEXT_COLOR_BLUE;
+            }
 
-    private void drawVerticalLine(PrintStream out) {
+            out.print(EMPTY.repeat(prefixLength));
+            printPlayer(out, board[boardRow][boardCol], lightSquare, color);
+            out.print(EMPTY.repeat(suffixLength));
+            lightSquare = !lightSquare;
 
-        int boardSizeInSpaces = BOARD_SIZE_IN_SQUARES * SQUARE_SIZE_IN_CHARS +
-                (BOARD_SIZE_IN_SQUARES - 1) * LINE_WIDTH_IN_CHARS;
-
-        for (int lineRow = 0; lineRow < LINE_WIDTH_IN_CHARS; ++lineRow) {
-            setRed(out);
-            out.print(EMPTY.repeat(boardSizeInSpaces));
+            if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
+                // Draw right line
+                setRed(out);
+                out.print(EMPTY.repeat(LINE_WIDTH_IN_CHARS));
+            }
 
             setBlack(out);
-            out.println();
         }
     }
 
@@ -221,10 +191,6 @@ public class GameplayUI {
         } else {
             out.print(EscapeSequences.SET_BG_COLOR_BLACK);
         }
-
-
         out.print(player);
-
-        //setWhite(out);
     }
 }
