@@ -4,12 +4,15 @@ import dataAccess.*;
 import dataAccess.memoryDAOs.MemoryAuthDAO;
 import dataAccess.memoryDAOs.MemoryGameDAO;
 import dataAccess.memoryDAOs.MemoryUserDAO;
+import org.eclipse.jetty.websocket.api.annotations.*;
+import org.eclipse.jetty.websocket.api.*;
 import server.handlers.ServerHandler;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
-import spark.*;
+import spark.Spark;
 
+@WebSocket
 public class Server {
     private ClearService clearService;
     private UserService userService;
@@ -17,7 +20,6 @@ public class Server {
     private UserDAO userDAO;
     private AuthDAO authDAO;
     private GameDAO gameDAO;
-    //private final WebSocketHandler webSocketHandler;
 
     public Server() {
         userDAO = new MemoryUserDAO();
@@ -26,7 +28,6 @@ public class Server {
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
-        //webSocketHandler = new WebSocketHandler();
     }
 
     public int run(int desiredPort) {
@@ -34,7 +35,8 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        //Spark.webSocket("/connect", webSocketHandler);
+        Spark.webSocket("/connect", Server.class);
+        Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
 
         Spark.post("/user", (req, res) -> {
             ServerHandler handler = ServerHandler.getInstance();
@@ -74,6 +76,12 @@ public class Server {
 
     public int port() {
         return Spark.port();
+    }
+
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws Exception {
+        System.out.printf("Received: %s", message);
+        session.getRemote().sendString("WebSocket response: " + message);
     }
 
     public void stop() {

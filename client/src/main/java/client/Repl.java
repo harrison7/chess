@@ -18,6 +18,8 @@ public class Repl implements NotificationHandler {
     private PostloginUI postloginUI;
     private GameplayUI gameplayUI;
 
+    private Server server;
+
     private int port;
     private String serverURL;
 
@@ -25,15 +27,15 @@ public class Repl implements NotificationHandler {
         this.port = port;
         this.serverURL = serverUrl;
 
+        server = new Server();
+        port = server.run(port);
+
         preloginUI = new PreloginUI(port);
         postloginUI = new PostloginUI(port);
         gameplayUI = new GameplayUI(port, serverURL, this);
     }
 
     public void run() throws IOException, URISyntaxException {
-        var server = new Server();
-        port = server.run(port);
-
         boolean quit = false;
         State state = PRELOGIN;
 
