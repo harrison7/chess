@@ -35,7 +35,7 @@ public class Repl implements NotificationHandler {
         gameplayUI = new GameplayUI(port, serverURL, this);
     }
 
-    public void run() throws IOException, URISyntaxException {
+    public void run() throws Exception {
         boolean quit = false;
         State state = PRELOGIN;
 

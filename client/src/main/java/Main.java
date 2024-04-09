@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import static client.ui.State.*;
 
 public class Main {
-    public static void main(String[] args) throws URISyntaxException, IOException {
+    public static void main(String[] args) throws Exception {
         int port = 8080;
         String serverUrl = "http://localhost:" + port;
         if (args.length == 1) {

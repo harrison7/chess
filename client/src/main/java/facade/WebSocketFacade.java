@@ -35,8 +35,20 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void send(String msg) throws Exception {
+        this.session.getBasicRemote().sendText(msg);
+    }
+
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void join() throws IOException {
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson("Joined bruh"));
+        } catch (IOException ex) {
+            throw new IOException(ex.getMessage());
+        }
     }
 }

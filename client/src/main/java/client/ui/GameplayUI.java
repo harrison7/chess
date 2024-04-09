@@ -60,9 +60,11 @@ public class GameplayUI {
         this.notificationHandler = notificationHandler;
     }
 
-    public State run() throws IOException {
+    public State run() throws Exception {
         state = GAMEPLAY;
         ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws.join();
+        ws.send("Jointeded");
 
         printBoard();
 
