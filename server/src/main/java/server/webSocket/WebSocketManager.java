@@ -39,7 +39,7 @@ public class WebSocketManager {
         JoinPlayerCommand action = new Gson().fromJson(message, JoinPlayerCommand.class);
         var user = action.getAuthString();
         connections.add(user, session);
-        var res = new LoadGameMessage();
+        var res = new LoadGameMessage(new ChessGame());
         connections.reply(user, res);
 
         var reply = String.format("%s is in the shop", action.getCommandType());
