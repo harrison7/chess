@@ -7,6 +7,7 @@ import dataAccess.memoryDAOs.MemoryUserDAO;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import server.handlers.ServerHandler;
+import server.webSocket.WebSocketManager;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -21,6 +22,8 @@ public class Server {
     private AuthDAO authDAO;
     private GameDAO gameDAO;
 
+    //private static WebSocketManager webSocketManager;
+
     public Server() {
         userDAO = new MemoryUserDAO();
         authDAO = new MemoryAuthDAO();
@@ -28,6 +31,7 @@ public class Server {
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
+        //webSocketManager = new WebSocketManager();
     }
 
     public int run(int desiredPort) {
@@ -80,7 +84,10 @@ public class Server {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
+        WebSocketManager manager = WebSocketManager.getInstance();
         System.out.printf("Received: %s", message);
+        manager.evaluateMessage(session, message);
+
         //
         //if message is joinGame
         // websocketManager.joinGame(session, message);
