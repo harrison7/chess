@@ -1,5 +1,6 @@
 package server.handlers;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.memoryDAOs.MemoryAuthDAO;
@@ -138,7 +139,7 @@ public class ServerHandler {
         var tempRequest = gson.fromJson(req.body(), CreateGameRequest.class);
         var request = new CreateGameRequest(req.headers("Authorization"), tempRequest.gameName());
         var auth = new AuthData(request.authorization(), "");
-        var game = new GameData(0, null, null, request.gameName(), null);
+        var game = new GameData(0, null, null, request.gameName(), new ChessGame());
 
         GameService service = new GameService(gameDAO, authDAO);
 
