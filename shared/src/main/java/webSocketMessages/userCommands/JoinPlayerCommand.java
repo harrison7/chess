@@ -4,8 +4,8 @@ import chess.ChessGame;
 
 public class JoinPlayerCommand extends UserGameCommand {
     private String username;
-    private int gameID;
     private ChessGame.TeamColor playerColor;
+    private int gameID;
     public JoinPlayerCommand(String authToken) {
         super(authToken);
         this.commandType = CommandType.JOIN_PLAYER;
