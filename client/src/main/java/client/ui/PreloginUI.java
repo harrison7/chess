@@ -12,6 +12,7 @@ public class PreloginUI {
 
     private State state;
     private ServerFacade facade;
+    private String authToken;
 
     public PreloginUI(int port) throws URISyntaxException, IOException {
         state = PRELOGIN;
@@ -68,7 +69,8 @@ public class PreloginUI {
 
     public State login(String username, String password) throws IOException, URISyntaxException {
         try {
-            facade.login(username, password);
+            var res = facade.login(username, password);
+            authToken = res.authToken();
             System.out.printf("Logged in as %s\n", username);
             return POSTLOGIN;
         } catch (IOException e) {
@@ -79,12 +81,17 @@ public class PreloginUI {
 
     public State register(String username, String password, String email) throws IOException, URISyntaxException {
         try {
-            facade.register(username, password, email);
+            var res = facade.register(username, password, email);
+            authToken = res.authToken();
             System.out.printf("Logged in as %s\n", username);
             return POSTLOGIN;
         } catch (IOException e) {
             System.out.printf("Register fail: %s\n", e);
             return PRELOGIN;
         }
+    }
+
+    public String getAuthToken() {
+        return authToken;
     }
 }

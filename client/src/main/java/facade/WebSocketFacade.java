@@ -8,16 +8,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import webSocket.NotificationHandler;
 import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.*;
 
 public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
+    private static String authToken;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws IOException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler, String authToken) throws IOException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/connect");
             this.notificationHandler = notificationHandler;
+            this.authToken = authToken;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -46,8 +49,9 @@ public class WebSocketFacade extends Endpoint {
 
     public void join() throws IOException {
         try {
-            this.session.getBasicRemote().sendText(new Gson().toJson("Joined bruh"));
-        } catch (IOException ex) {
+            var action = new JoinPlayerCommand(authToken);
+            send(new Gson().toJson(action));
+        } catch (Exception ex) {
             throw new IOException(ex.getMessage());
         }
     }

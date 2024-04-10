@@ -81,7 +81,14 @@ public class Server {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         System.out.printf("Received: %s", message);
-        session.getRemote().sendString("WebSocket response: " + message);
+        //
+        //if message is joinGame
+        // websocketManager.joinGame(session, message);
+        // find the corresponding game
+        // check if the player is in that game
+        // verify the auth
+        //
+        //session.getRemote().sendString("WebSocket response: " + message);
     }
 
     public void stop() {

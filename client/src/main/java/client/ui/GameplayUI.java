@@ -19,6 +19,7 @@ public class GameplayUI {
     private final String serverUrl;
     private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
+    private String authToken;
 
     private boolean lightSquare = true;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -53,16 +54,21 @@ public class GameplayUI {
     private final String[] whiteCols = {"8", "7", "6", "5", "4", "3", "2", "1"};
     private final String[] blackCols = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
-    public GameplayUI(int port, String serverURL, NotificationHandler notificationHandler) throws URISyntaxException, IOException {
+    public GameplayUI(int port, String serverURL, NotificationHandler notificationHandler, String authToken) throws URISyntaxException, IOException {
         state = GAMEPLAY;
         facade = new ServerFacade(port);
         this.serverUrl = serverURL;
         this.notificationHandler = notificationHandler;
+        this.authToken = authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     public State run() throws Exception {
         state = GAMEPLAY;
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws = new WebSocketFacade(serverUrl, notificationHandler, authToken);
         ws.join();
         ws.send("Jointeded");
 

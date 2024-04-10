@@ -32,7 +32,7 @@ public class Repl implements NotificationHandler {
 
         preloginUI = new PreloginUI(port);
         postloginUI = new PostloginUI(port);
-        gameplayUI = new GameplayUI(port, serverURL, this);
+        gameplayUI = new GameplayUI(port, serverURL, this, "");
     }
 
     public void run() throws Exception {
@@ -51,6 +51,7 @@ public class Repl implements NotificationHandler {
                     state = postloginUI.run();
                     break;
                 case GAMEPLAY:
+                    gameplayUI.setAuthToken(preloginUI.getAuthToken());
                     state = gameplayUI.run();
                     break;
             }
@@ -60,7 +61,7 @@ public class Repl implements NotificationHandler {
     }
 
     public void notify(ServerMessage notification) {
-        //System.out.println(RED + notification.message());
+        System.out.println(notification.getServerMessageType());
         printPrompt();
     }
 
