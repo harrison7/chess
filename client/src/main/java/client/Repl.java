@@ -4,7 +4,6 @@ import client.ui.GameplayUI;
 import client.ui.PostloginUI;
 import client.ui.PreloginUI;
 import client.ui.State;
-import server.Server;
 import webSocket.NotificationHandler;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
@@ -20,7 +19,7 @@ public class Repl implements NotificationHandler {
     private PostloginUI postloginUI;
     private GameplayUI gameplayUI;
 
-    private Server server;
+    //private Server server;
 
     private int port;
     private String serverURL;
@@ -29,8 +28,8 @@ public class Repl implements NotificationHandler {
         this.port = port;
         this.serverURL = serverUrl;
 
-        server = new Server();
-        port = server.run(port);
+//        server = new Server();
+//        port = server.run(port);
 
         preloginUI = new PreloginUI(port);
         postloginUI = new PostloginUI(port);
@@ -62,7 +61,7 @@ public class Repl implements NotificationHandler {
             }
         }
 
-        server.stop();
+        //server.stop();
     }
 
     public void notify(ServerMessage notification) {
