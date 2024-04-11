@@ -19,8 +19,10 @@ import static java.sql.Types.NULL;
 
 public class MySQLGameDAO extends HelperGameDAO {
     private static MySQLGameDAO instance;
+    private static CommonDatabase db;
     public MySQLGameDAO() throws DataAccessException {
-        configureDatabase();
+        db = new CommonDatabase();
+        db.configureDatabase(createStatements);
     }
     public static synchronized MySQLGameDAO getInstance() throws DataAccessException {
         if (instance == null) {
@@ -32,16 +34,16 @@ public class MySQLGameDAO extends HelperGameDAO {
     @Override
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE game";
-        executeUpdate(statement);
+        db.executeUpdate(statement);
     }
     @Override
     public GameData createGame(GameData game) throws DataAccessException {
         var statement = "INSERT INTO game (whiteUsername, blackUsername, name, " +
                 " json) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(game.game());
-        var id = executeUpdate(statement, game.whiteUsername(), game.blackUsername(),
+        var id = db.executeUpdate(statement, game.whiteUsername(), game.blackUsername(),
                 game.gameName(), json);
-        return new GameData(id, game.whiteUsername(), game.blackUsername(),
+        return new GameData(Integer.parseInt(id), game.whiteUsername(), game.blackUsername(),
                 game.gameName(), game.game());
     }
     @Override
@@ -74,9 +76,9 @@ public class MySQLGameDAO extends HelperGameDAO {
         var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, " +
                 "name=?, json=? WHERE id=?";
         var json = new Gson().toJson(updatedGame.game());
-        var id = executeUpdate(statement, updatedGame.whiteUsername(),
+        var id = db.executeUpdate(statement, updatedGame.whiteUsername(),
                 updatedGame.blackUsername(), updatedGame.gameName(), json, trueGame.gameID());
-        return new GameData(id, updatedGame.whiteUsername(),
+        return new GameData(Integer.parseInt(id), updatedGame.whiteUsername(),
                 updatedGame.blackUsername(), updatedGame.gameName(),
                 updatedGame.game());
     };
@@ -109,29 +111,6 @@ public class MySQLGameDAO extends HelperGameDAO {
         return new GameData(id, whiteUsername, blackUsername, gameName, game);
     }
 
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
-
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
-    }
-
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS  game (
@@ -145,18 +124,4 @@ public class MySQLGameDAO extends HelperGameDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }

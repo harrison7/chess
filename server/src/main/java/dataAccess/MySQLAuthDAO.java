@@ -13,8 +13,10 @@ import static java.sql.Types.NULL;
 
 public class MySQLAuthDAO implements AuthDAO {
     private static MySQLAuthDAO instance;
+    private static CommonDatabase db;
     public MySQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+        db = new CommonDatabase();
+        db.configureDatabase(createStatements);
     }
     public static synchronized MySQLAuthDAO getInstance() throws DataAccessException {
         if (instance == null) {
@@ -25,13 +27,13 @@ public class MySQLAuthDAO implements AuthDAO {
 
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE auth";
-        executeUpdate(statement);
+        db.executeUpdate(statement);
     }
     public AuthData createAuth(AuthData auth) throws DataAccessException {
         var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         String authToken = UUID.randomUUID().toString();
         AuthData newToken = new AuthData(authToken, auth.username());
-        var id = executeUpdate(statement, newToken.authToken(), newToken.username());
+        var id = db.executeUpdate(statement, newToken.authToken(), newToken.username());
         return new AuthData(newToken.authToken(), newToken.username());
     }
     public AuthData getAuth(AuthData auth) throws DataAccessException {
@@ -68,35 +70,13 @@ public class MySQLAuthDAO implements AuthDAO {
         }
 
         var deleteStatement = "DELETE FROM auth WHERE authToken=?";
-        executeUpdate(deleteStatement, auth.authToken());
+        db.executeUpdate(deleteStatement, auth.authToken());
     }
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
         var authToken = rs.getString("authToken");
         var username = rs.getString("username");
         return new AuthData(authToken, username);
-    }
-
-    private String executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
-
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getString(1);
-                }
-
-                return "";
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
     }
 
     private final String[] createStatements = {
@@ -110,18 +90,4 @@ public class MySQLAuthDAO implements AuthDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }
