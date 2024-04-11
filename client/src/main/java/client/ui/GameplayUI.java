@@ -46,7 +46,7 @@ public class GameplayUI {
                     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-                    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                    {' ', ' ', ' ', ' ', 'P', ' ', ' ', ' '},
                     {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
                     {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'}};
     private Character[][] blackBoard =
@@ -123,11 +123,21 @@ public class GameplayUI {
     }
 
     public void move(String pieceRow, String pieceCol, String destRow, String destCol, String promotion) throws IOException {
-        int row = (9 - Integer.parseInt(pieceRow));
-        int col = pieceCol.charAt(0) - 'a' + 1;
-        int newRow = (9 - Integer.parseInt(destRow));
-        int newCol = destCol.charAt(0) - 'a' + 1;
-
+        int row;
+        int col;
+        int newRow;
+        int newCol;
+        if (teamColor == WHITE) {
+            row = Integer.parseInt(pieceRow);
+            col = pieceCol.charAt(0) - 'a' + 1;
+            newRow = Integer.parseInt(destRow);
+            newCol = destCol.charAt(0) - 'a' + 1;
+        } else {
+            row = 9 - Integer.parseInt(pieceRow);
+            col = 9 - pieceCol.charAt(0) - 'a' + 1;
+            newRow = 9 - Integer.parseInt(destRow);
+            newCol = 9 - destCol.charAt(0) - 'a' + 1;
+        }
         ChessPiece.PieceType piece;
 
         if (promotion != null) {
@@ -154,8 +164,8 @@ public class GameplayUI {
 
     public void setGame(ChessGame game) {
         this.game = game;
-        whiteBoard = game.displayBoard(true);
-        blackBoard = game.displayBoard(false);
+        whiteBoard = this.game.displayBoard(true);
+        blackBoard = this.game.displayBoard(false);
 
         printBoard();
     }
@@ -181,7 +191,7 @@ public class GameplayUI {
         }
         //out.println();
         out.print(EscapeSequences.RESET_BG_COLOR);
-        out.print(EscapeSequences.RESET_TEXT_COLOR);
+        out.print(EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 
     private void drawHeaders(PrintStream out, String[] headers) {
