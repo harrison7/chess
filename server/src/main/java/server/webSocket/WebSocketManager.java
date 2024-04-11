@@ -1,5 +1,6 @@
 package server.webSocket;
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataAccess.DataAccessException;
 import dataAccess.*;
@@ -107,17 +108,36 @@ public class WebSocketManager {
         }
     }
 
-    public void makeMove(Session session, String message) throws IOException {
+    public void makeMove(Session session, String message) throws IOException, DataAccessException {
         MakeMoveCommand action = new Gson().fromJson(message, MakeMoveCommand.class);
         var user = action.getAuthString();
         var game = gameDAO.getGame(new GameData(action.getGameID(), "", "", "", null));
-        //Make the move
-        var res = new LoadGameMessage(new ChessGame());
-        connections.broadcast("", res);
+        try {
+            var fullUser = authDAO.getAuth(new AuthData(user, ""));
+            String clientColor;
+            if (Objects.equals(fullUser.username(), game.whiteUsername())) {
+                clientColor = "WHITE";
+            } else {
+                clientColor = "BLACK";
+            }
+            if ((game.game().getTeamTurn() == WHITE && clientColor.equals("BLACK")) ||
+                    (game.game().getTeamTurn() == BLACK && clientColor.equals("WHITE"))) {
+                var res = new ErrorMessage("Error: wrong turn");
+                connections.reply(user, res);
+            } else {
+                game.game().makeMove(action.getChessMove());
+                gameDAO.updateGame(game, fullUser, clientColor);
+                var res = new LoadGameMessage(new ChessGame());
+                connections.broadcast("", res);
 
-        var reply = String.format("%s made this move:", action.getUsername());
-        var notification = new NotificationMessage(reply);
-        connections.broadcast(user, notification);
+                var reply = String.format("%s made this move:", action.getUsername());
+                var notification = new NotificationMessage(reply);
+                connections.broadcast(user, notification);
+            }
+        } catch (InvalidMoveException e) {
+            var res = new ErrorMessage("Error: invalid move");
+            connections.reply(user, res);
+        }
     }
 
     public void leave(Session session, String message) throws IOException {

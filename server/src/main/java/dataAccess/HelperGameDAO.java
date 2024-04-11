@@ -32,8 +32,8 @@ public class HelperGameDAO implements GameDAO {
                                          String clientColor)
             throws DataAccessException {
         GameData updatedGame;
-        if ((clientColor.equals("WHITE") && game.whiteUsername() != null) ||
-                (clientColor.equals("BLACK") && game.blackUsername() != null)){
+        if ((clientColor.equals("WHITE") && game.whiteUsername() != null && !game.whiteUsername().equals(auth.username())) ||
+                (clientColor.equals("BLACK") && game.blackUsername() != null && !game.blackUsername().equals(auth.username()))){
             throw new DataAccessException("already taken");
         } else if (clientColor.equals("WHITE")) {
             updatedGame = new GameData(game.gameID(), auth.username(),
