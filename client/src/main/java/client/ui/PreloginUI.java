@@ -27,22 +27,7 @@ public class PreloginUI {
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
         var params = line.split(" ");
-//        switch (params[0]) {
-//            case "help":
-//                help();
-//                break;
-//            case "quit":
-//                state = quit();
-//                break;
-//            case "login":
-//                state = login(params[1], params[2]);
-//                break;
-//            case "register":
-//                state = register(params[1], params[2], params[3]);
-//                break;
-//            default:
-//                System.out.println("Unknown command");
-//        }
+
         if (params[0].equals("help") && params.length == 1) {
             help();
         } else if (params[0].equals("quit") && params.length == 1) {

@@ -28,10 +28,6 @@ public class ServerFacade {
         }
     }
 
-//    public String register(UserData user) throws DataAccessException {
-//        return "";
-//    }
-
     public RegisterResult register(String username, String password, String email) throws IOException, URISyntaxException {
         URI uri = new URI("http://localhost:" + port + "/user");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -169,14 +165,14 @@ public class ServerFacade {
         }
     }
 
-    private static Object receiveResponse(HttpURLConnection http) throws IOException {
-        var statusCode = http.getResponseCode();
-        var statusMessage = http.getResponseMessage();
-
-        Object responseBody = readResponseBody(http);
-        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", statusCode, statusMessage, responseBody);
-        return responseBody;
-    }
+//    private static Object receiveResponse(HttpURLConnection http) throws IOException {
+//        var statusCode = http.getResponseCode();
+//        var statusMessage = http.getResponseMessage();
+//
+//        Object responseBody = readResponseBody(http);
+//        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", statusCode, statusMessage, responseBody);
+//        return responseBody;
+//    }
 
     private static Object readResponseBody(HttpURLConnection http) throws IOException {
         Object responseBody = "";
@@ -186,17 +182,4 @@ public class ServerFacade {
         }
         return responseBody;
     }
-
-//    private String convertToBody(ArrayList<String> params) {
-//        StringBuilder body = new StringBuilder();
-//        body.append("{");
-//        for (int i = 0; i < params.size(); i += 2) {
-//            body.append("\"").append(params.get(i)).append("\"").append(":");
-//
-//            body.append("\"" + )
-//
-//        }
-//    }
-
-
 }

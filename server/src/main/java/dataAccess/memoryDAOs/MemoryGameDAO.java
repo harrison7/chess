@@ -47,15 +47,6 @@ public class MemoryGameDAO extends HelperGameDAO {
             var trueGame = gameList.get(game.gameID() - 1);
             return gameList.get(trueGame.gameID() - 1);
         }
-//        GameData returnGame = null;
-//        for (var gameName : gameList.values()) {
-//            if (Objects.equals(gameName.gameName(), game.gameName())) {
-//                returnGame = gameName;
-//            }
-//        }
-//        if (returnGame != null) {
-//            return returnGame;
-//        }
         else {
             throw new DataAccessException("Game does not exist");
         }
