@@ -1,8 +1,12 @@
 package client.ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import facade.ServerFacade;
 import facade.WebSocketFacade;
+import model.GameData;
 import webSocket.NotificationHandler;
 
 import java.io.IOException;
@@ -12,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 import static client.ui.State.*;
 
 public class GameplayUI {
@@ -24,6 +30,7 @@ public class GameplayUI {
     private ChessGame game;
     private int gameID;
     private ChessGame.TeamColor teamColor;
+    private String username;
 
     private boolean lightSquare = true;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -85,11 +92,11 @@ public class GameplayUI {
         } else if (params[0].equals("redraw") && params.length == 1) {
             redraw();
         } else if (params[0].equals("leave") && params.length == 1) {
-            //state = leave();
-        } else if (params[0].equals("move") && params.length == 5) {
-            //move();
+            state = leave();
+        } else if (params[0].equals("move") && (params.length == 5 || params.length == 6)) {
+            move(params[1], params[2], params[3], params[4], (params.length == 5) ? null : params[5]);
         } else if (params[0].equals("resign") && params.length == 1) {
-            //resign();
+            resign();
         } else if (params[0].equals("highlight") && params.length == 1) {
             //highlight();
         } else {
@@ -110,16 +117,52 @@ public class GameplayUI {
         printBoard();
     }
 
+    public State leave() throws IOException {
+        ws.leave(gameID);
+        return POSTLOGIN;
+    }
+
+    public void move(String pieceRow, String pieceCol, String destRow, String destCol, String promotion) throws IOException {
+        int row = (9 - Integer.parseInt(pieceRow));
+        int col = pieceCol.charAt(0) - 'a' + 1;
+        int newRow = (9 - Integer.parseInt(destRow));
+        int newCol = destCol.charAt(0) - 'a' + 1;
+
+        ChessPiece.PieceType piece;
+
+        if (promotion != null) {
+            piece = switch(promotion) {
+                case "QUEEN" -> ChessPiece.PieceType.QUEEN;
+                case "ROOK" -> ChessPiece.PieceType.ROOK;
+                case "BISHOP" -> ChessPiece.PieceType.BISHOP;
+                case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+                default -> null;
+            };
+        } else {
+            piece = null;
+        }
+
+        ChessPosition startPos = new ChessPosition(row, col);
+        ChessPosition endPos = new ChessPosition(newRow, newCol);
+        ChessMove move = new ChessMove(startPos, endPos, piece);
+        ws.makeMove(move, gameID);
+    }
+
+    public void resign() throws IOException {
+        ws.resign(gameID);
+    }
+
     public void setGame(ChessGame game) {
         this.game = game;
         whiteBoard = game.displayBoard(true);
         blackBoard = game.displayBoard(false);
+
         printBoard();
     }
 
-    public void setGameID(int gameID, ChessGame.TeamColor teamColor) {
+    public void setGameID(int gameID) {
         this.gameID = gameID;
-        this.teamColor = teamColor;
+        //this.teamColor = teamColor;
     }
 
     private void printBoard() {
@@ -127,18 +170,18 @@ public class GameplayUI {
 
         out.print(EscapeSequences.ERASE_SCREEN);
 
-        drawHeaders(out, whiteHeader);
-        drawChessBoard(out, whiteBoard, whiteCols);
-        drawHeaders(out, whiteHeader);
-
-        out.println();
-
-        drawHeaders(out, blackHeader);
-        drawChessBoard(out, blackBoard, blackCols);
-        drawHeaders(out, blackHeader);
-
-        out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-        out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
+        if (teamColor == WHITE) {
+            drawHeaders(out, whiteHeader);
+            drawChessBoard(out, whiteBoard, whiteCols);
+            drawHeaders(out, whiteHeader);
+        } else if (teamColor == BLACK) {
+            drawHeaders(out, blackHeader);
+            drawChessBoard(out, blackBoard, blackCols);
+            drawHeaders(out, blackHeader);
+        }
+        //out.println();
+        out.print(EscapeSequences.RESET_BG_COLOR);
+        out.print(EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private void drawHeaders(PrintStream out, String[] headers) {
@@ -239,5 +282,13 @@ public class GameplayUI {
             out.print(EscapeSequences.SET_BG_COLOR_BLACK);
         }
         out.print(player);
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setColor(ChessGame.TeamColor color) {
+        teamColor = color;
     }
 }

@@ -1,17 +1,22 @@
 package client.ui;
 
+import chess.ChessGame;
 import facade.ServerFacade;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.Scanner;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 import static client.ui.State.*;
 
 public class PostloginUI {
     private State state;
     private ServerFacade facade;
     private int gameID;
+    private ChessGame.TeamColor color;
 
     public PostloginUI(int port) throws URISyntaxException, IOException {
         state = POSTLOGIN;
@@ -101,13 +106,19 @@ public class PostloginUI {
     }
 
     public State join(String id, String color) throws IOException, URISyntaxException {
-        facade.joinGame("", color, Integer.parseInt(id));
+        String newColor = facade.joinGame("", color, Integer.parseInt(id)).message();
+        if (Objects.equals(newColor, "WHITE")) {
+            this.color = WHITE;
+        } else if (Objects.equals(newColor, "BLACK")) {
+            this.color = BLACK;
+        }
         gameID = Integer.parseInt(id);
         return GAMEPLAY;
     }
 
     public State observe(String id) throws IOException, URISyntaxException {
-        facade.joinGame("", null, Integer.parseInt(id));
+        facade.joinGame("", null, Integer.parseInt(id)).message();
+        color = WHITE;
         return GAMEPLAY;
     }
     public State quit() {
@@ -116,5 +127,9 @@ public class PostloginUI {
 
     public int getGameID() {
         return gameID;
+    }
+
+    public ChessGame.TeamColor getColor() {
+        return color;
     }
 }

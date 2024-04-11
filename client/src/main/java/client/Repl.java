@@ -53,6 +53,8 @@ public class Repl implements NotificationHandler {
                     state = postloginUI.run();
                     break;
                 case GAMEPLAY:
+                    gameplayUI.setUsername(preloginUI.getUsername());
+                    gameplayUI.setColor(postloginUI.getColor());
                     gameplayUI.setGameID(postloginUI.getGameID());
                     gameplayUI.setAuthToken(preloginUI.getAuthToken());
                     state = gameplayUI.run();
