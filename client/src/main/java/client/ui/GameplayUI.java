@@ -22,6 +22,8 @@ public class GameplayUI {
     private WebSocketFacade ws;
     private String authToken;
     private ChessGame game;
+    private int gameID;
+    private ChessGame.TeamColor teamColor;
 
     private boolean lightSquare = true;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -71,23 +73,53 @@ public class GameplayUI {
     public State run() throws Exception {
         state = GAMEPLAY;
         ws = new WebSocketFacade(serverUrl, notificationHandler, authToken);
-        ws.joinPlayer();
+        ws.joinPlayer(gameID);
 
         //printBoard();
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
-        if (Objects.equals(line, "Leave")) {
-            return POSTLOGIN;
+        var params = line.split(" ");
+        if (params[0].equals("help") && params.length == 1) {
+            help();
+        } else if (params[0].equals("redraw") && params.length == 1) {
+            redraw();
+        } else if (params[0].equals("leave") && params.length == 1) {
+            //state = leave();
+        } else if (params[0].equals("move") && params.length == 5) {
+            //move();
+        } else if (params[0].equals("resign") && params.length == 1) {
+            //resign();
+        } else if (params[0].equals("highlight") && params.length == 1) {
+            //highlight();
         } else {
-            return GAMEPLAY;
+            System.out.println("Unknown command");
         }
+        return state;
+    }
+
+    public void help() {
+        System.out.println("  redraw - the board");
+        System.out.println("  leave - the game");
+        System.out.println("  move <PIECE_ROW>[1-8] <PIECE_COL>[a-h] <DEST_ROW>[1-8] <DEST_COL>[a-h] - move a piece");
+        System.out.println("  resign - a game");
+        System.out.println("  highlight - legal moves");
+    }
+
+    public void redraw() {
+        printBoard();
     }
 
     public void setGame(ChessGame game) {
         this.game = game;
-        whiteBoard = game.displayWhiteBoard();
+        whiteBoard = game.displayBoard(true);
+        blackBoard = game.displayBoard(false);
         printBoard();
+    }
+
+    public void setGameID(int gameID, ChessGame.TeamColor teamColor) {
+        this.gameID = gameID;
+        this.teamColor = teamColor;
     }
 
     private void printBoard() {

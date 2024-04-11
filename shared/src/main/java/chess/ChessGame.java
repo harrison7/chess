@@ -1,7 +1,9 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -226,14 +228,27 @@ public class ChessGame {
         return board;
     }
 
-    public Character[][] displayWhiteBoard() {
+    public Character[][] displayBoard(boolean isWhite) {
         Character[][] whiteBoard = new Character[8][8];
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                whiteBoard[i][j] = board.getSquares()[i][j].toString().charAt(0);
+                if (board.getSquares()[i][j] != null) {
+                    whiteBoard[i][j] = board.getSquares()[i][j].toString().charAt(0);
+                } else {
+                    whiteBoard[i][j] = ' ';
+                }
+
+                //System.out.println(whiteBoard[i][j]);
+            }
+            if (!isWhite) {
+                Collections.reverse(Arrays.asList(whiteBoard[i]));
             }
         }
+        if (!isWhite) {
+            Collections.reverse(Arrays.asList(whiteBoard));
+        }
+
         return whiteBoard;
     }
 }

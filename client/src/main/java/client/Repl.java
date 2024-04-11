@@ -11,6 +11,7 @@ import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import static client.ui.State.PRELOGIN;
 
@@ -52,6 +53,7 @@ public class Repl implements NotificationHandler {
                     state = postloginUI.run();
                     break;
                 case GAMEPLAY:
+                    gameplayUI.setGameID(postloginUI.getGameID());
                     gameplayUI.setAuthToken(preloginUI.getAuthToken());
                     state = gameplayUI.run();
                     break;
