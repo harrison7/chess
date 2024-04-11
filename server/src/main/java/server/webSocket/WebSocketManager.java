@@ -2,7 +2,8 @@ package server.webSocket;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccess.DataAccessException;
-import dataAccess.MySQLGameDAO;
+import dataAccess.*;
+import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.*;
 import webSocketMessages.serverMessages.*;
@@ -17,9 +18,13 @@ public class WebSocketManager {
     private static WebSocketManager instance;
     private ConnectionManager connections;
     protected MySQLGameDAO gameDAO;
+    protected MySQLUserDAO userDAO;
+    protected MySQLAuthDAO authDAO;
     public WebSocketManager() throws DataAccessException {
         connections = ConnectionManager.getInstance();
         gameDAO = MySQLGameDAO.getInstance();
+        userDAO = MySQLUserDAO.getInstance();
+        authDAO = MySQLAuthDAO.getInstance();
     }
 
     public static synchronized WebSocketManager getInstance() throws DataAccessException {
@@ -44,39 +49,68 @@ public class WebSocketManager {
     public void joinPlayer(Session session, String message) throws IOException, DataAccessException {
         JoinPlayerCommand action = new Gson().fromJson(message, JoinPlayerCommand.class);
         var user = action.getAuthString();
+        connections.add(user, session);
 
         var game = gameDAO.getGame(new GameData(action.getGameID(), "", "", "", null));
-        if ((game.whiteUsername() != null && action.getPlayerColor() == WHITE) ||
-                (game.blackUsername() != null && action.getPlayerColor() == BLACK)) {
-            var res = new ErrorMessage("Error: team is already taken");
-            connections.reply(user, res);
-        } else {
-            connections.add(user, session);
-            var res = new LoadGameMessage(game.game());
-            connections.reply(user, res);
 
-            var reply = String.format("%s joined the game", action.getUsername());
-            var notification = new NotificationMessage(reply);
-            connections.broadcast(user, notification);
+        try {
+            var joiningUser = authDAO.getAuth(new AuthData(user, ""));
+            if (game == null) {
+                var res = new ErrorMessage("Error: bad game ID");
+                connections.reply(user, res);
+                connections.remove(user);
+            } else if ((!Objects.equals(game.whiteUsername(), joiningUser.username()) && action.getPlayerColor() == WHITE) ||
+                    (!Objects.equals(game.blackUsername(), joiningUser.username()) && action.getPlayerColor() == BLACK)) {
+                var res = new ErrorMessage("Error: wrong team or empty team");
+                connections.reply(user, res);
+                connections.remove(user);
+            } else {
+                var res = new LoadGameMessage(game.game());
+                connections.reply(user, res);
+
+                var reply = String.format("%s joined the game", action.getUsername());
+                var notification = new NotificationMessage(reply);
+                connections.broadcast(user, notification);
+            }
+        } catch (DataAccessException e) {
+            var res = new ErrorMessage("Error: bad authToken");
+            connections.reply(user, res);
+            connections.remove(user);
         }
-
     }
 
-    public void joinObserver(Session session, String message) throws IOException {
+    public void joinObserver(Session session, String message) throws IOException, DataAccessException {
         JoinObserverCommand action = new Gson().fromJson(message, JoinObserverCommand.class);
         var user = action.getAuthString();
         connections.add(user, session);
-        var res = new LoadGameMessage(new ChessGame());
-        connections.reply(user, res);
 
-        var reply = String.format("%s joined as an observer", action.getUsername());
-        var notification = new NotificationMessage(reply);
-        connections.broadcast(user, notification);
+        var game = gameDAO.getGame(new GameData(action.getGameID(), "", "", "", null));
+
+        try {
+            authDAO.getAuth(new AuthData(user, ""));
+            if (game == null) {
+                var res = new ErrorMessage("Error: bad game ID");
+                connections.reply(user, res);
+                connections.remove(user);
+            } else {
+                var res = new LoadGameMessage(game.game());
+                connections.reply(user, res);
+
+                var reply = String.format("%s joined as an observer", action.getUsername());
+                var notification = new NotificationMessage(reply);
+                connections.broadcast(user, notification);
+            }
+        } catch (DataAccessException e) {
+            var res = new ErrorMessage("Error: bad authToken");
+            connections.reply(user, res);
+            connections.remove(user);
+        }
     }
 
     public void makeMove(Session session, String message) throws IOException {
         MakeMoveCommand action = new Gson().fromJson(message, MakeMoveCommand.class);
         var user = action.getAuthString();
+        var game = gameDAO.getGame(new GameData(action.getGameID(), "", "", "", null));
         //Make the move
         var res = new LoadGameMessage(new ChessGame());
         connections.broadcast("", res);
@@ -91,7 +125,6 @@ public class WebSocketManager {
         var user = action.getAuthString();
         connections.remove(user);
         var res = new LoadGameMessage(new ChessGame());
-        //connections.broadcast("", res);
 
         var reply = String.format("%s left the game", action.getUsername());
         var notification = new NotificationMessage(reply);

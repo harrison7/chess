@@ -11,4 +11,8 @@ public class JoinObserverCommand extends UserGameCommand{
     public String getUsername() {
         return username;
     }
+
+    public int getGameID() {
+        return gameID;
+    }
 }

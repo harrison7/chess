@@ -15,4 +15,8 @@ public class MakeMoveCommand extends UserGameCommand {
     public String getUsername() {
         return username;
     }
+
+    public int getGameID() {
+        return gameID;
+    }
 }
