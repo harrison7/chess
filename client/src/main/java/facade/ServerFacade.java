@@ -165,21 +165,5 @@ public class ServerFacade {
         }
     }
 
-//    private static Object receiveResponse(HttpURLConnection http) throws IOException {
-//        var statusCode = http.getResponseCode();
-//        var statusMessage = http.getResponseMessage();
-//
-//        Object responseBody = readResponseBody(http);
-//        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", statusCode, statusMessage, responseBody);
-//        return responseBody;
-//    }
 
-    private static Object readResponseBody(HttpURLConnection http) throws IOException {
-        Object responseBody = "";
-        try (InputStream respBody = http.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            responseBody = new Gson().fromJson(inputStreamReader, Map.class);
-        }
-        return responseBody;
-    }
 }
