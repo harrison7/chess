@@ -1,3 +1,3 @@
-package server.results;
+package results;
 
 public record ClearResult(String message) {}

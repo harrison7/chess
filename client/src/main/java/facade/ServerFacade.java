@@ -1,7 +1,7 @@
 package facade;
 
 import com.google.gson.Gson;
-import server.results.*;
+import results.*;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;

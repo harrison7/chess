@@ -2,11 +2,6 @@ package service;
 
 import dataAccess.*;
 import model.*;
-import server.requests.RegisterRequest;
-import server.results.RegisterResult;
-
-import java.util.HashMap;
-import java.util.Objects;
 
 public class UserService {
     UserDAO userDAO;

@@ -1,9 +1,7 @@
 package service;
 
 import dataAccess.*;
-import server.results.ClearResult;
-
-import javax.xml.crypto.Data;
+import results.ClearResult;
 
 public class ClearService {
     private UserDAO userDAO;

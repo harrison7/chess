@@ -3,19 +3,15 @@ package server.handlers;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataAccess.*;
-import dataAccess.memoryDAOs.MemoryAuthDAO;
-import dataAccess.memoryDAOs.MemoryGameDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import server.requests.*;
-import server.results.*;
+import requests.*;
+import results.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.*;
-
-import java.util.Objects;
 
 public class ServerHandler {
 
