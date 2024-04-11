@@ -168,7 +168,8 @@ public class ServerHandler {
         try {
             var username = authDAO.getAuth(tempAuth).username();
             var auth = new AuthData(request.authorization(), username);
-            var game = new GameData(request.gameID(), null, null, null, null);
+            var falseGame = new GameData(request.gameID(), null, null, null, null);
+            var game = gameDAO.getGame(falseGame);
             var newGame = service.joinGame(auth, game, request.playerColor());
             var result = new JoinGameResult(null);
             res.status(200);

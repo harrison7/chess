@@ -9,5 +9,7 @@ public class LoadGameMessage extends ServerMessage {
         this.game = game;
     }
 
-
+    public ChessGame getGame() {
+        return game;
+    }
 }

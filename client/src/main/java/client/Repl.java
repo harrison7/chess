@@ -6,6 +6,7 @@ import client.ui.PreloginUI;
 import client.ui.State;
 import server.Server;
 import webSocket.NotificationHandler;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
@@ -62,10 +63,8 @@ public class Repl implements NotificationHandler {
 
     public void notify(ServerMessage notification) {
         System.out.println(notification.getServerMessageType());
-        printPrompt();
-    }
-
-    private void printPrompt() {
-        //System.out.print("\n" + RESET + ">>> " + GREEN);
+        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            gameplayUI.setGame(((LoadGameMessage)notification).getGame());
+        }
     }
 }

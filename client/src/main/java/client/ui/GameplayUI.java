@@ -1,5 +1,6 @@
 package client.ui;
 
+import chess.ChessGame;
 import facade.ServerFacade;
 import facade.WebSocketFacade;
 import webSocket.NotificationHandler;
@@ -20,6 +21,7 @@ public class GameplayUI {
     private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
     private String authToken;
+    private ChessGame game;
 
     private boolean lightSquare = true;
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -69,10 +71,9 @@ public class GameplayUI {
     public State run() throws Exception {
         state = GAMEPLAY;
         ws = new WebSocketFacade(serverUrl, notificationHandler, authToken);
-        ws.join();
-        ws.send("Jointeded");
+        ws.joinPlayer();
 
-        printBoard();
+        //printBoard();
 
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
@@ -81,6 +82,12 @@ public class GameplayUI {
         } else {
             return GAMEPLAY;
         }
+    }
+
+    public void setGame(ChessGame game) {
+        this.game = game;
+        whiteBoard = game.displayWhiteBoard();
+        printBoard();
     }
 
     private void printBoard() {

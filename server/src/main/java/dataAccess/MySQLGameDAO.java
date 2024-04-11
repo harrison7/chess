@@ -64,7 +64,9 @@ public class MySQLGameDAO extends HelperGameDAO {
     @Override
     public GameData updateGame(GameData game, AuthData auth, String clientColor)
             throws DataAccessException {
-        var trueGame = getGame(game);
+        var dbGame = getGame(game);
+        var trueGame = new GameData(dbGame.gameID(), dbGame.whiteUsername(),
+                dbGame.blackUsername(), dbGame.gameName(), game.game());
         if (clientColor == null) {
             return trueGame;
         }

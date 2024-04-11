@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
     private static ConnectionManager instance;
-    private static ConcurrentHashMap<String, Connection> connections;
+    private static ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection>> connections;
 
     ConnectionManager() {
 
@@ -25,25 +25,28 @@ public class ConnectionManager {
         return instance;
     }
 
-    public void add(String username, Session session) {
+    public void add(int gameID, String username, Session session) {
         var connection = new Connection(username, session);
-        connections.put(username, connection);
+        if (!connections.containsKey(gameID)) {
+            connections.put(gameID, new ConcurrentHashMap<>());
+        }
+        connections.get(gameID).put(username, connection);
     }
 
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public void remove(int gameID, String visitorName) {
+        connections.get(gameID).remove(visitorName);
     }
 
-    public void reply(String username, ServerMessage message) throws IOException {
-        var userConnection = connections.get(username);
+    public void reply(int gameID, String username, ServerMessage message) throws IOException {
+        var userConnection = connections.get(gameID).get(username);
         if (userConnection != null) {
             userConnection.send(message.toString());
         }
     }
 
-    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
+    public void broadcast(int gameID, String excludeVisitorName, ServerMessage notification) throws IOException {
         var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
+        for (var c : connections.get(gameID).values()) {
             if (c.session.isOpen()) {
                 if (!c.visitorName.equals(excludeVisitorName)) {
                     c.send(notification.toString());
@@ -55,7 +58,7 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            connections.remove(c.visitorName);
+            connections.get(gameID).remove(c.visitorName);
         }
     }
 }

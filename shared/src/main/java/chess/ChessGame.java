@@ -13,10 +13,12 @@ public class ChessGame {
 
     private TeamColor team;
     private ChessBoard board = new ChessBoard();
+    private boolean resigned;
 
     public ChessGame() {
         team = TeamColor.WHITE;
         board.resetBoard();
+        resigned = false;
     }
 
     /**
@@ -33,6 +35,14 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         this.team = team;
+    }
+
+    public void setResigned(boolean resigned) {
+        this.resigned = resigned;
+    }
+
+    public boolean isResigned() {
+        return resigned;
     }
 
     /**
@@ -214,5 +224,16 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public Character[][] displayWhiteBoard() {
+        Character[][] whiteBoard = new Character[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                whiteBoard[i][j] = board.getSquares()[i][j].toString().charAt(0);
+            }
+        }
+        return whiteBoard;
     }
 }

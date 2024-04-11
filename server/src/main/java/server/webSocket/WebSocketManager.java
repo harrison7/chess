@@ -50,7 +50,7 @@ public class WebSocketManager {
     public void joinPlayer(Session session, String message) throws IOException, DataAccessException {
         JoinPlayerCommand action = new Gson().fromJson(message, JoinPlayerCommand.class);
         var user = action.getAuthString();
-        connections.add(user, session);
+        connections.add(action.getGameID(), user, session);
 
         var game = gameDAO.getGame(new GameData(action.getGameID(), "", "", "", null));
 
@@ -58,32 +58,32 @@ public class WebSocketManager {
             var joiningUser = authDAO.getAuth(new AuthData(user, ""));
             if (game == null) {
                 var res = new ErrorMessage("Error: bad game ID");
-                connections.reply(user, res);
-                connections.remove(user);
+                connections.reply(action.getGameID(), user, res);
+                connections.remove(action.getGameID(), user);
             } else if ((!Objects.equals(game.whiteUsername(), joiningUser.username()) && action.getPlayerColor() == WHITE) ||
                     (!Objects.equals(game.blackUsername(), joiningUser.username()) && action.getPlayerColor() == BLACK)) {
                 var res = new ErrorMessage("Error: wrong team or empty team");
-                connections.reply(user, res);
-                connections.remove(user);
+                connections.reply(action.getGameID(), user, res);
+                connections.remove(action.getGameID(), user);
             } else {
                 var res = new LoadGameMessage(game.game());
-                connections.reply(user, res);
+                connections.reply(action.getGameID(), user, res);
 
                 var reply = String.format("%s joined the game", action.getUsername());
                 var notification = new NotificationMessage(reply);
-                connections.broadcast(user, notification);
+                connections.broadcast(action.getGameID(), user, notification);
             }
         } catch (DataAccessException e) {
             var res = new ErrorMessage("Error: bad authToken");
-            connections.reply(user, res);
-            connections.remove(user);
+            connections.reply(action.getGameID(), user, res);
+            connections.remove(action.getGameID(), user);
         }
     }
 
     public void joinObserver(Session session, String message) throws IOException, DataAccessException {
         JoinObserverCommand action = new Gson().fromJson(message, JoinObserverCommand.class);
         var user = action.getAuthString();
-        connections.add(user, session);
+        connections.add(action.getGameID(), user, session);
 
         var game = gameDAO.getGame(new GameData(action.getGameID(), "", "", "", null));
 
@@ -91,20 +91,20 @@ public class WebSocketManager {
             authDAO.getAuth(new AuthData(user, ""));
             if (game == null) {
                 var res = new ErrorMessage("Error: bad game ID");
-                connections.reply(user, res);
-                connections.remove(user);
+                connections.reply(action.getGameID(), user, res);
+                connections.remove(action.getGameID(), user);
             } else {
                 var res = new LoadGameMessage(game.game());
-                connections.reply(user, res);
+                connections.reply(action.getGameID(), user, res);
 
                 var reply = String.format("%s joined as an observer", action.getUsername());
                 var notification = new NotificationMessage(reply);
-                connections.broadcast(user, notification);
+                connections.broadcast(action.getGameID(), user, notification);
             }
         } catch (DataAccessException e) {
             var res = new ErrorMessage("Error: bad authToken");
-            connections.reply(user, res);
-            connections.remove(user);
+            connections.reply(action.getGameID(), user, res);
+            connections.remove(action.getGameID(), user);
         }
     }
 
@@ -120,45 +120,71 @@ public class WebSocketManager {
             } else {
                 clientColor = "BLACK";
             }
-            if ((game.game().getTeamTurn() == WHITE && clientColor.equals("BLACK")) ||
+            if (game.game().isInCheckmate(WHITE) || game.game().isInCheckmate(BLACK) ||
+                    game.game().isInStalemate(WHITE) || game.game().isInStalemate(BLACK)) {
+                var res = new ErrorMessage("Error: game over");
+                connections.reply(action.getGameID(), user, res);
+            } else if ((game.game().getTeamTurn() == WHITE && clientColor.equals("BLACK")) ||
                     (game.game().getTeamTurn() == BLACK && clientColor.equals("WHITE"))) {
                 var res = new ErrorMessage("Error: wrong turn");
-                connections.reply(user, res);
+                connections.reply(action.getGameID(), user, res);
+            } else if (game.game().isResigned()) {
+                var res = new ErrorMessage("Error: resigned");
+                connections.reply(action.getGameID(), user, res);
             } else {
                 game.game().makeMove(action.getChessMove());
                 gameDAO.updateGame(game, fullUser, clientColor);
-                var res = new LoadGameMessage(new ChessGame());
-                connections.broadcast("", res);
+                var res = new LoadGameMessage(game.game());
+                connections.broadcast(action.getGameID(), "", res);
 
                 var reply = String.format("%s made this move:", action.getUsername());
                 var notification = new NotificationMessage(reply);
-                connections.broadcast(user, notification);
+                connections.broadcast(action.getGameID(), user, notification);
             }
         } catch (InvalidMoveException e) {
             var res = new ErrorMessage("Error: invalid move");
-            connections.reply(user, res);
+            connections.reply(action.getGameID(), user, res);
         }
     }
 
     public void leave(Session session, String message) throws IOException {
         LeaveCommand action = new Gson().fromJson(message, LeaveCommand.class);
         var user = action.getAuthString();
-        connections.remove(user);
+        connections.remove(action.getGameID(), user);
         var res = new LoadGameMessage(new ChessGame());
 
         var reply = String.format("%s left the game", action.getUsername());
         var notification = new NotificationMessage(reply);
-        connections.broadcast(user, notification);
+        connections.broadcast(action.getGameID(), user, notification);
     }
 
-    public void resign(Session session, String message) throws IOException {
+    public void resign(Session session, String message) throws IOException, DataAccessException {
         ResignCommand action = new Gson().fromJson(message, ResignCommand.class);
         var user = action.getAuthString();
         var res = new LoadGameMessage(new ChessGame());
-        //connections.broadcast("", res);
+        var game = gameDAO.getGame(new GameData(action.getGameID(), "", "", "", null));
 
-        var reply = String.format("%s left the game", action.getUsername());
+        var fullUser = authDAO.getAuth(new AuthData(user, ""));
+        String clientColor;
+        if (Objects.equals(fullUser.username(), game.whiteUsername())) {
+            clientColor = "WHITE";
+        } else if (Objects.equals(fullUser.username(), game.blackUsername())){
+            clientColor = "BLACK";
+        } else {
+            var errorRes = new ErrorMessage("Error: observer cannot resign");
+            connections.reply(action.getGameID(), user, errorRes);
+            return;
+        }
+        if (game.game().isResigned()) {
+            var errorRes = new ErrorMessage("Error: game already resigned");
+            connections.reply(action.getGameID(), user, errorRes);
+            return;
+        }
+        game.game().setResigned(true);
+        gameDAO.updateGame(game, fullUser, clientColor);
+
+        var reply = String.format("%s resigned", action.getUsername());
         var notification = new NotificationMessage(reply);
-        connections.broadcast("", notification);
+        connections.broadcast(action.getGameID(), "", notification);
     }
 }

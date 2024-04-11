@@ -47,6 +47,10 @@ public class ChessBoard {
         return returnStr.toString();
     }
 
+    public ChessPiece[][] getSquares() {
+        return squares;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
