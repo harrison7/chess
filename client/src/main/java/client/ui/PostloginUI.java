@@ -51,7 +51,7 @@ public class PostloginUI {
     }
 
     public void help() {
-        System.out.println("  create <NAME> - a game");
+        System.out.println("  create <NAME> - a game ");
         System.out.println("  list - games");
         System.out.println("  join <ID> [WHITE|BLACK|<empty>] - a game");
         System.out.println("  observe <ID> - a game");
