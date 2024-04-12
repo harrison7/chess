@@ -11,6 +11,7 @@ import java.net.*;
 import java.util.Map;
 
 public class ServerFacade {
+
     private static int port;
     private static String authToken;
     public ServerFacade(int port) throws URISyntaxException, IOException {
