@@ -17,16 +17,6 @@ public class ServerFacade {
     public ServerFacade(int port) throws URISyntaxException, IOException {
         this.port = port;
         URI uri = new URI("http://localhost:" + port + "/db");
-        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-        http.setRequestMethod("DELETE");
-        JsonObject body = new JsonObject();
-        writeRequestBody(body.toString(), http);
-        http.connect();
-        RegisterResult res;
-        try (InputStream respBody = http.getInputStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-            res = new Gson().fromJson(inputStreamReader, RegisterResult.class);
-        }
     }
 
     public RegisterResult register(String username, String password, String email) throws IOException, URISyntaxException {
