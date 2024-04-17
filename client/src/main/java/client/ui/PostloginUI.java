@@ -97,6 +97,7 @@ public class PostloginUI {
         facade.joinGame("", null, Integer.parseInt(id)).message();
         color = WHITE;
         spectating = true;
+        gameID = Integer.parseInt(id);
         return GAMEPLAY;
     }
     public State quit() {

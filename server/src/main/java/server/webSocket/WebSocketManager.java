@@ -138,11 +138,27 @@ public class WebSocketManager {
                 var res = new LoadGameMessage(game.game());
                 connections.broadcast(action.getGameID(), "", res);
 
-                var pieceType = game.game().getBoard().getPiece(action.getChessMove().getStartPosition());
+                var pieceType = game.game().getBoard().getPiece(action.getChessMove().getEndPosition()).getPieceType();
 
-                var reply = String.format("%s moved %s %s", action.getUsername(), pieceType, action.getChessMove());
+                var reply = String.format("%s moved %s from %s to %s", action.getUsername(), pieceType, action.getChessMove().getStartPosition(), action.getChessMove().getEndPosition());
                 var notification = new NotificationMessage(reply);
                 connections.broadcast(action.getGameID(), user, notification);
+
+                var opponent = game.game().getTeamTurn();
+                var opponentName = (opponent == WHITE) ? game.whiteUsername() : game.blackUsername();
+                if (game.game().isInCheckmate(opponent)) {
+                    reply = String.format("%s is in checkmate", opponentName);
+                    notification = new NotificationMessage(reply);
+                    connections.broadcast(action.getGameID(), "", notification);
+                } else if (game.game().isInStalemate(opponent)) {
+                    reply = "Stalemate";
+                    notification = new NotificationMessage(reply);
+                    connections.broadcast(action.getGameID(), "", notification);
+                } else if (game.game().isInCheck(opponent)) {
+                    reply = String.format("%s is in check", opponentName);
+                    notification = new NotificationMessage(reply);
+                    connections.broadcast(action.getGameID(), "", notification);
+                }
             }
         } catch (InvalidMoveException e) {
             var res = new ErrorMessage("Error: invalid move");
