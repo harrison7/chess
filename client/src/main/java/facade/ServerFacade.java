@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class ServerFacade {
 
-    private static int port;
-    private static String authToken;
+    private int port;
+    private String authToken;
     public ServerFacade(int port) throws URISyntaxException, IOException {
         this.port = port;
         URI uri = new URI("http://localhost:" + port + "/db");

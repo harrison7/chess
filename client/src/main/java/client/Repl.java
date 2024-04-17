@@ -4,6 +4,7 @@ import client.ui.GameplayUI;
 import client.ui.PostloginUI;
 import client.ui.PreloginUI;
 import client.ui.State;
+import facade.ServerFacade;
 import webSocket.NotificationHandler;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
@@ -24,16 +25,16 @@ public class Repl implements NotificationHandler {
     private int port;
     private String serverURL;
 
-    public Repl(int port, String serverUrl) throws URISyntaxException, IOException {
+    public Repl(int port, String serverUrl, ServerFacade sf) throws URISyntaxException, IOException {
         this.port = port;
         this.serverURL = serverUrl;
 
 //        server = new Server();
 //        port = server.run(port);
 
-        preloginUI = new PreloginUI(port);
-        postloginUI = new PostloginUI(port);
-        gameplayUI = new GameplayUI(port, serverURL, this, "");
+        preloginUI = new PreloginUI(port, sf);
+        postloginUI = new PostloginUI(port, sf);
+        gameplayUI = new GameplayUI(port, serverURL, this, "", sf);
     }
 
     public void run() throws Exception {

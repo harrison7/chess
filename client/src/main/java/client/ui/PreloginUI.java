@@ -15,9 +15,9 @@ public class PreloginUI {
     private String authToken;
     private String username;
 
-    public PreloginUI(int port) throws URISyntaxException, IOException {
+    public PreloginUI(int port, ServerFacade sf) throws URISyntaxException, IOException {
         state = PRELOGIN;
-        facade = new ServerFacade(port);
+        facade = sf;
     }
 
     public State run() throws IOException, URISyntaxException {

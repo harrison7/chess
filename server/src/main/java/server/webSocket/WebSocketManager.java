@@ -133,6 +133,7 @@ public class WebSocketManager {
                 connections.reply(action.getGameID(), user, res);
             } else {
                 game.game().makeMove(action.getChessMove());
+                game.game().setTeamTurn((clientColor =="WHITE") ? BLACK : WHITE);
                 gameDAO.updateGame(game, fullUser, clientColor);
                 var res = new LoadGameMessage(game.game());
                 connections.broadcast(action.getGameID(), "", res);

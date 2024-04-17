@@ -18,9 +18,9 @@ public class PostloginUI {
     private int gameID;
     private ChessGame.TeamColor color;
 
-    public PostloginUI(int port) throws URISyntaxException, IOException {
+    public PostloginUI(int port, ServerFacade sf) throws URISyntaxException, IOException {
         state = POSTLOGIN;
-        facade = new ServerFacade(port);
+        facade = sf;
     }
 
     public State run() throws IOException, URISyntaxException {

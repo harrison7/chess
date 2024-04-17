@@ -65,9 +65,9 @@ public class GameplayUI {
     private final String[] whiteCols = {"8", "7", "6", "5", "4", "3", "2", "1"};
     private final String[] blackCols = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
-    public GameplayUI(int port, String serverURL, NotificationHandler notificationHandler, String authToken) throws URISyntaxException, IOException {
+    public GameplayUI(int port, String serverURL, NotificationHandler notificationHandler, String authToken, ServerFacade sf) throws URISyntaxException, IOException {
         state = GAMEPLAY;
-        facade = new ServerFacade(port);
+        facade = sf;
         this.serverUrl = serverURL;
         this.notificationHandler = notificationHandler;
         this.authToken = authToken;

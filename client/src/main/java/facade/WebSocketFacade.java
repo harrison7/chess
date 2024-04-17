@@ -20,7 +20,7 @@ import static webSocketMessages.serverMessages.ServerMessage.ServerMessageType.*
 public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
-    private static String authToken;
+    private String authToken;
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler, String authToken) throws IOException {
         try {
