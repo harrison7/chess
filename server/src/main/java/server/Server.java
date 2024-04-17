@@ -85,7 +85,7 @@ public class Server {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         WebSocketManager manager = WebSocketManager.getInstance();
-        System.out.printf("Received: %s", message);
+        System.out.printf("Received: %s\n", message);
         manager.evaluateMessage(session, message);
 
         //

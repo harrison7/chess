@@ -8,6 +8,7 @@ import facade.ServerFacade;
 import webSocket.NotificationHandler;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class Repl implements NotificationHandler {
                     gameplayUI.setColor(postloginUI.getColor());
                     gameplayUI.setGameID(postloginUI.getGameID());
                     gameplayUI.setAuthToken(preloginUI.getAuthToken());
-                    state = gameplayUI.run();
+                    state = gameplayUI.run(postloginUI.getSpectating());
                     break;
             }
         }
@@ -72,6 +73,8 @@ public class Repl implements NotificationHandler {
             gameplayUI.setGame(((LoadGameMessage)notification).getGame());
         } else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             System.out.println(((ErrorMessage)notification).getErrorMessage());
+        } else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+            System.out.println(((NotificationMessage)notification).getMessage());
         }
     }
 }

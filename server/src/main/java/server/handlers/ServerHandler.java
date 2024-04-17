@@ -167,11 +167,6 @@ public class ServerHandler {
             var falseGame = new GameData(request.gameID(), null, null, null, null);
             var game = gameDAO.getGame(falseGame);
             String color = request.playerColor();
-            if (color == null && game.whiteUsername() == null) {
-                color = "WHITE";
-            } else if (color == null) {
-                color = "BLACK";
-            }
             var newGame = service.joinGame(auth, game, color);
             var result = new JoinGameResult(color);
             res.status(200);

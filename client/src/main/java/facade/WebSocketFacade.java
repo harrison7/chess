@@ -15,19 +15,19 @@ import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.*;
 
-import static webSocketMessages.serverMessages.ServerMessage.ServerMessageType.*;
-
 public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
     private String authToken;
+    private String username;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler, String authToken) throws IOException {
+    public WebSocketFacade(String url, NotificationHandler notificationHandler, String authToken, String username) throws IOException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/connect");
             this.notificationHandler = notificationHandler;
             this.authToken = authToken;
+            this.username = username;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -65,9 +65,10 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinPlayer(int gameID) throws IOException {
+    public void joinPlayer(int gameID, ChessGame.TeamColor teamColor) throws IOException {
         try {
-            var action = new JoinPlayerCommand(authToken, gameID);
+
+            var action = new JoinPlayerCommand(authToken, gameID, username, teamColor);
             send(new Gson().toJson(action));
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());
@@ -76,7 +77,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void joinObserver(int gameID) throws IOException {
         try {
-            var action = new JoinObserverCommand(authToken, gameID);
+            var action = new JoinObserverCommand(authToken, gameID, username);
             send(new Gson().toJson(action));
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());
@@ -85,7 +86,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void makeMove(ChessMove move, int gameID) throws IOException {
         try {
-            var action = new MakeMoveCommand(authToken, move, gameID);
+            var action = new MakeMoveCommand(authToken, move, gameID, username);
             send(new Gson().toJson(action));
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());
@@ -94,7 +95,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void leave(int gameID) throws IOException {
         try {
-            var action = new LeaveCommand(authToken, gameID);
+            var action = new LeaveCommand(authToken, gameID, username);
             send(new Gson().toJson(action));
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());
@@ -103,7 +104,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void resign(int gameID) throws IOException {
         try {
-            var action = new ResignCommand(authToken, gameID);
+            var action = new ResignCommand(authToken, gameID, username);
             send(new Gson().toJson(action));
         } catch (Exception ex) {
             throw new IOException(ex.getMessage());

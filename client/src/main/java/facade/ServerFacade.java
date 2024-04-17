@@ -97,7 +97,7 @@ public class ServerFacade {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             res = new Gson().fromJson(inputStreamReader, ListGamesResult.class);
         }
-        System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
+        //System.out.printf("= Response =========\n[%d] %s\n\n%s\n\n", http.getResponseCode(), http.getResponseMessage(), res);
 
         return res;
     }

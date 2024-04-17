@@ -77,10 +77,14 @@ public class GameplayUI {
         this.authToken = authToken;
     }
 
-    public State run() throws Exception {
+    public State run(boolean spectating) throws Exception {
         state = GAMEPLAY;
-        ws = new WebSocketFacade(serverUrl, notificationHandler, authToken);
-        ws.joinPlayer(gameID);
+        ws = new WebSocketFacade(serverUrl, notificationHandler, authToken, username);
+        if (spectating) {
+            ws.joinObserver(gameID);
+        } else {
+            ws.joinPlayer(gameID, teamColor);
+        }
 
         //printBoard();
 

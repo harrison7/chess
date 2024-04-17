@@ -17,10 +17,12 @@ public class PostloginUI {
     private ServerFacade facade;
     private int gameID;
     private ChessGame.TeamColor color;
+    private boolean spectating;
 
     public PostloginUI(int port, ServerFacade sf) throws URISyntaxException, IOException {
         state = POSTLOGIN;
         facade = sf;
+        spectating = true;
     }
 
     public State run() throws IOException, URISyntaxException {
@@ -87,12 +89,14 @@ public class PostloginUI {
             this.color = BLACK;
         }
         gameID = Integer.parseInt(id);
+        spectating = false;
         return GAMEPLAY;
     }
 
     public State observe(String id) throws IOException, URISyntaxException {
         facade.joinGame("", null, Integer.parseInt(id)).message();
         color = WHITE;
+        spectating = true;
         return GAMEPLAY;
     }
     public State quit() {
@@ -105,5 +109,9 @@ public class PostloginUI {
 
     public ChessGame.TeamColor getColor() {
         return color;
+    }
+
+    public boolean getSpectating() {
+        return spectating;
     }
 }

@@ -69,7 +69,7 @@ public class WebSocketManager {
                 var res = new LoadGameMessage(game.game());
                 connections.reply(action.getGameID(), user, res);
 
-                var reply = String.format("%s joined the game", action.getUsername());
+                var reply = String.format("%s joined the game as %s", action.getUsername(), action.getPlayerColor());
                 var notification = new NotificationMessage(reply);
                 connections.broadcast(action.getGameID(), user, notification);
             }
@@ -133,12 +133,14 @@ public class WebSocketManager {
                 connections.reply(action.getGameID(), user, res);
             } else {
                 game.game().makeMove(action.getChessMove());
-                game.game().setTeamTurn((clientColor =="WHITE") ? BLACK : WHITE);
+                game.game().setTeamTurn((clientColor.equals("WHITE")) ? BLACK : WHITE);
                 gameDAO.updateGame(game, fullUser, clientColor);
                 var res = new LoadGameMessage(game.game());
                 connections.broadcast(action.getGameID(), "", res);
 
-                var reply = String.format("%s made this move:", action.getUsername());
+                var pieceType = game.game().getBoard().getPiece(action.getChessMove().getStartPosition());
+
+                var reply = String.format("%s moved %s %s", action.getUsername(), pieceType, action.getChessMove());
                 var notification = new NotificationMessage(reply);
                 connections.broadcast(action.getGameID(), user, notification);
             }
