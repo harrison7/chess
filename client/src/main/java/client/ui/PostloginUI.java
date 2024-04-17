@@ -38,8 +38,8 @@ public class PostloginUI {
             create(params[1]);
         } else if (params[0].equals("list") && params.length == 1) {
             list();
-        } else if (params[0].equals("join") && (params.length == 2) || (params.length == 3)) {
-            state = join(params[1], (params.length == 2) ? null : params[2]);
+        } else if (params[0].equals("join") && (params.length == 3)) {
+            state = join(params[1], params[2]);
         }  else if (params[0].equals("observe") && params.length == 2) {
             state = observe(params[1]);
         } else if (params[0].equals("quit") && params.length == 4) {

@@ -6,6 +6,7 @@ import client.ui.PreloginUI;
 import client.ui.State;
 import facade.ServerFacade;
 import webSocket.NotificationHandler;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 
@@ -69,6 +70,8 @@ public class Repl implements NotificationHandler {
         System.out.println(notification.getServerMessageType());
         if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             gameplayUI.setGame(((LoadGameMessage)notification).getGame());
+        } else if (notification.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+            System.out.println(((ErrorMessage)notification).getErrorMessage());
         }
     }
 }

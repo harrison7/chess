@@ -127,17 +127,17 @@ public class GameplayUI {
         int col;
         int newRow;
         int newCol;
-        if (teamColor == WHITE) {
+        //if (teamColor == WHITE) {
             row = Integer.parseInt(pieceRow);
             col = pieceCol.charAt(0) - 'a' + 1;
             newRow = Integer.parseInt(destRow);
             newCol = destCol.charAt(0) - 'a' + 1;
-        } else {
-            row = 9 - Integer.parseInt(pieceRow);
-            col = 9 - pieceCol.charAt(0) - 'a' + 1;
-            newRow = 9 - Integer.parseInt(destRow);
-            newCol = 9 - destCol.charAt(0) - 'a' + 1;
-        }
+        //} else {
+//            row = 9 - Integer.parseInt(pieceRow);
+//            col = 9 - (pieceCol.charAt(0) - 'a' + 1);
+//            newRow = 9 - Integer.parseInt(destRow);
+//            newCol = 9 - (destCol.charAt(0) - 'a' + 1);
+        //}
         ChessPiece.PieceType piece;
 
         if (promotion != null) {
