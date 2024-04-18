@@ -101,8 +101,8 @@ public class GameplayUI {
             move(params[1], params[2], params[3], params[4], (params.length == 5) ? null : params[5]);
         } else if (params[0].equals("resign") && params.length == 1) {
             resign();
-        } else if (params[0].equals("highlight") && params.length == 1) {
-            //highlight();
+        } else if (params[0].equals("highlight") && params.length == 3) {
+            highlight(params[1], params[2]);
         } else {
             System.out.println("Unknown command");
         }
@@ -118,7 +118,7 @@ public class GameplayUI {
     }
 
     public void redraw() {
-        printBoard();
+        printBoard(false, null);
     }
 
     public State leave() throws IOException {
@@ -131,17 +131,10 @@ public class GameplayUI {
         int col;
         int newRow;
         int newCol;
-        //if (teamColor == WHITE) {
-            row = Integer.parseInt(pieceRow);
-            col = pieceCol.charAt(0) - 'a' + 1;
-            newRow = Integer.parseInt(destRow);
-            newCol = destCol.charAt(0) - 'a' + 1;
-        //} else {
-//            row = 9 - Integer.parseInt(pieceRow);
-//            col = 9 - (pieceCol.charAt(0) - 'a' + 1);
-//            newRow = 9 - Integer.parseInt(destRow);
-//            newCol = 9 - (destCol.charAt(0) - 'a' + 1);
-        //}
+        row = Integer.parseInt(pieceRow);
+        col = pieceCol.charAt(0) - 'a' + 1;
+        newRow = Integer.parseInt(destRow);
+        newCol = destCol.charAt(0) - 'a' + 1;
         ChessPiece.PieceType piece;
 
         if (promotion != null) {
@@ -166,12 +159,21 @@ public class GameplayUI {
         ws.resign(gameID);
     }
 
+    public void highlight(String pieceRow, String pieceCol) {
+        int row;
+        int col;
+        row = Integer.parseInt(pieceRow);
+        col = pieceCol.charAt(0) - 'a' + 1;
+        var pos = new ChessPosition(row, col);
+        printBoard(true, pos);
+    }
+
     public void setGame(ChessGame game) {
         this.game = game;
         whiteBoard = this.game.displayBoard(true);
         blackBoard = this.game.displayBoard(false);
 
-        printBoard();
+        printBoard(false, null);
     }
 
     public void setGameID(int gameID) {
@@ -179,18 +181,18 @@ public class GameplayUI {
         //this.teamColor = teamColor;
     }
 
-    private void printBoard() {
+    private void printBoard(boolean highlight, ChessPosition pos) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(EscapeSequences.ERASE_SCREEN);
 
         if (teamColor == WHITE) {
             drawHeaders(out, whiteHeader);
-            drawChessBoard(out, whiteBoard, whiteCols);
+            drawChessBoard(out, whiteBoard, whiteCols, highlight, pos);
             drawHeaders(out, whiteHeader);
         } else if (teamColor == BLACK) {
             drawHeaders(out, blackHeader);
-            drawChessBoard(out, blackBoard, blackCols);
+            drawChessBoard(out, blackBoard, blackCols, highlight, pos);
             drawHeaders(out, blackHeader);
         }
         //out.println();
@@ -231,22 +233,36 @@ public class GameplayUI {
         setBlack(out);
     }
 
-    private void drawChessBoard(PrintStream out, Character[][] board, String[] cols) {
+    private void drawChessBoard(PrintStream out, Character[][] board, String[] cols, boolean highlight, ChessPosition pos) {
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
             drawHeader(out, cols[boardRow]);
-            drawRowOfSquares(boardRow, out, board);
+            drawRowOfSquares(boardRow, out, board, highlight, pos);
             drawHeader(out, cols[boardRow]);
             out.println();
             lightSquare = !lightSquare;
         }
     }
 
-    private void drawRowOfSquares(int boardRow, PrintStream out, Character[][] board) {
+    private void drawRowOfSquares(int boardRow, PrintStream out, Character[][] board, boolean highlight, ChessPosition pos) {
+        Character[][] validMoves = new Character[8][8];
+        if (highlight) {
+            validMoves = game.highlightBoard((teamColor == WHITE), pos);
+        }
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             if (lightSquare) {
-                setWhite(out);
+                if (highlight && validMoves[boardRow][boardCol] == 'X'){
+                    setLightGreen(out);
+                } else {
+                    setWhite(out);
+                }
+
             } else {
-                setBlack(out);
+                if (highlight && validMoves[boardRow][boardCol] == 'X'){
+                    setDarkGreen(out);
+                } else {
+                    setBlack(out);
+                }
+
             }
 
             int prefixLength = SQUARE_SIZE_IN_CHARS / 2;
@@ -288,13 +304,23 @@ public class GameplayUI {
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
     }
 
+    private void setLightGreen(PrintStream out) {
+        out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+        out.print(EscapeSequences.SET_TEXT_COLOR_GREEN);
+    }
+
+    private void setDarkGreen(PrintStream out) {
+        out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+        out.print(EscapeSequences.SET_TEXT_COLOR_GREEN);
+    }
+
     private void printPlayer(PrintStream out, Character player, boolean light, String team) {
         out.print(team);
-        if (light) {
-            out.print(EscapeSequences.SET_BG_COLOR_WHITE);
-        } else {
-            out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-        }
+//        if (light) {
+//            out.print(EscapeSequences.SET_BG_COLOR_WHITE);
+//        } else {
+//            out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+//        }
         out.print(player);
     }
 

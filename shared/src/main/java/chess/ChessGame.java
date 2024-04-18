@@ -251,4 +251,29 @@ public class ChessGame {
 
         return whiteBoard;
     }
+
+    public Character[][] highlightBoard(boolean isWhite, ChessPosition pos) {
+        Character[][] whiteBoard = new Character[8][8];
+        var validMoves = validMoves(pos);
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (validMoves.contains(new ChessMove(pos, new ChessPosition(8 - i, j + 1), null))) {
+                    whiteBoard[i][j] = 'X';
+                } else {
+                    whiteBoard[i][j] = ' ';
+                }
+
+                //System.out.println(whiteBoard[i][j]);
+            }
+            if (!isWhite) {
+                Collections.reverse(Arrays.asList(whiteBoard[i]));
+            }
+        }
+        if (!isWhite) {
+            Collections.reverse(Arrays.asList(whiteBoard));
+        }
+
+        return whiteBoard;
+    }
 }
